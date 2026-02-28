@@ -1,0 +1,514 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------------< com.chen:hmdp >----------------------------
+[INFO] Building hmdp 1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ hmdp ---
+[INFO] Deleting E:\DianPing\secondHandMarket\2handMarket\target
+[INFO] 
+[INFO] --- resources:3.2.0:resources (default-resources) @ hmdp ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] Copying 1 resource
+[INFO] Copying 120 resources
+[INFO] 
+[INFO] --- compiler:3.10.1:compile (default-compile) @ hmdp ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 72 source files to E:\DianPing\secondHandMarket\2handMarket\target\classes
+[INFO] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/SimpleRedisLock.java: E:\DianPing\secondHandMarket\2handMarket\src\main\java\com\hmdp\utils\SimpleRedisLock.java使用或覆盖了已过时的 API。
+[INFO] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/SimpleRedisLock.java: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。
+[INFO] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherOrderServiceImpl.java: E:\DianPing\secondHandMarket\2handMarket\src\main\java\com\hmdp\service\impl\VoucherOrderServiceImpl.java使用了未经检查或不安全的操作。
+[INFO] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherOrderServiceImpl.java: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/ShopGeoDataLoader.java:[27,8] 类 ProductGeoDataLoader 是公共的, 应在名为 ProductGeoDataLoader.java 的文件中声明
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/UserController.java:[82,13] 找不到符号
+  符号:   方法 setCreateTime(<nulltype>)
+  位置: 类型为com.hmdp.entity.UserInfo的变量 info
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/UserController.java:[83,13] 找不到符号
+  符号:   方法 setUpdateTime(<nulltype>)
+  位置: 类型为com.hmdp.entity.UserInfo的变量 info
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/UserController.java:[95,48] 找不到符号
+  符号:   方法 getId()
+  位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/dto/Result.java:[19,16] 无法将类 com.hmdp.dto.Result中的构造器 Result应用到给定类型;
+  需要: 没有参数
+  找到:    boolean,<nulltype>,<nulltype>,<nulltype>
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/dto/Result.java:[22,16] 无法将类 com.hmdp.dto.Result中的构造器 Result应用到给定类型;
+  需要: 没有参数
+  找到:    boolean,<nulltype>,java.lang.Object,<nulltype>
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/dto/Result.java:[25,16] 无法将类 com.hmdp.dto.Result中的构造器 Result应用到给定类型;
+  需要: 没有参数
+  找到:    boolean,<nulltype>,java.util.List<capture#1, 共 ?>,java.lang.Long
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/dto/Result.java:[28,16] 无法将类 com.hmdp.dto.Result中的构造器 Result应用到给定类型;
+  需要: 没有参数
+  找到:    boolean,java.lang.String,<nulltype>,<nulltype>
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherServiceImpl.java:[51,44] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.entity.Voucher的变量 voucher
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherServiceImpl.java:[52,40] 找不到符号
+  符号:   方法 getStock()
+  位置: 类型为com.hmdp.entity.Voucher的变量 voucher
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherServiceImpl.java:[53,44] 找不到符号
+  符号:   方法 getBeginTime()
+  位置: 类型为com.hmdp.entity.Voucher的变量 voucher
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherServiceImpl.java:[54,42] 找不到符号
+  符号:   方法 getEndTime()
+  位置: 类型为com.hmdp.entity.Voucher的变量 voucher
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherServiceImpl.java:[59,86] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.entity.Voucher的变量 voucher
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherServiceImpl.java:[59,102] 找不到符号
+  符号:   方法 getStock()
+  位置: 类型为com.hmdp.entity.Voucher的变量 voucher
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/UserServiceImpl.java:[53,12] 无法将接口 org.apache.ibatis.logging.Log中的方法 debug应用到给定类型;
+  需要: java.lang.String
+  找到:    java.lang.String,java.lang.String,java.lang.String
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/UserServiceImpl.java:[59,33] 找不到符号
+  符号:   方法 getPhone()
+  位置: 类型为com.hmdp.dto.LoginFormDTO的变量 loginForm
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/UserServiceImpl.java:[64,32] 找不到符号
+  符号:   方法 getCode()
+  位置: 类型为com.hmdp.dto.LoginFormDTO的变量 loginForm
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/UserServiceImpl.java:[91,13] 找不到符号
+  符号:   方法 setPhone(java.lang.String)
+  位置: 类型为com.hmdp.entity.User的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/UserServiceImpl.java:[92,13] 找不到符号
+  符号:   方法 setNickName(java.lang.String)
+  位置: 类型为com.hmdp.entity.User的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/UserServiceImpl.java:[101,29] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.dto.UserDTO的变量 loginUser
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/UserServiceImpl.java:[130,43] 找不到符号
+  符号:   方法 getId()
+  位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/UserServiceImpl.java:[150,43] 找不到符号
+  符号:   方法 getId()
+  位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/ShopGeoDataLoader.java:[41,84] 方法引用无效
+  找不到符号
+    符号:   方法 getTypeId()
+    位置: 类 com.hmdp.entity.Product
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/ShopGeoDataLoader.java:[56,42] 找不到符号
+  符号:   方法 getX()
+  位置: 类型为com.hmdp.entity.Product的变量 product
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/ShopGeoDataLoader.java:[56,58] 找不到符号
+  符号:   方法 getY()
+  位置: 类型为com.hmdp.entity.Product的变量 product
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/ShopGeoDataLoader.java:[55,32] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.entity.Product的变量 product
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/ShopGeoDataLoader.java:[60,9] 找不到符号
+  符号:   变量 log
+  位置: 类 com.hmdp.config.ProductGeoDataLoader
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherOrderServiceImpl.java:[197,43] 找不到符号
+  符号:   方法 getId()
+  位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherOrderServiceImpl.java:[294,21] 找不到符号
+  符号:   方法 setId(long)
+  位置: 类型为com.hmdp.entity.VoucherOrder的变量 voucherOrder
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherOrderServiceImpl.java:[296,43] 找不到符号
+  符号:   方法 getId()
+  位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherOrderServiceImpl.java:[297,21] 找不到符号
+  符号:   方法 setUserId(java.lang.Long)
+  位置: 类型为com.hmdp.entity.VoucherOrder的变量 voucherOrder
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherOrderServiceImpl.java:[299,21] 找不到符号
+  符号:   方法 setVoucherId(java.lang.Long)
+  位置: 类型为com.hmdp.entity.VoucherOrder的变量 voucherOrder
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/ProductController.java:[50,33] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.entity.Product的变量 product
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/WebExceptionAdvice.java:[14,9] 找不到符号
+  符号:   变量 log
+  位置: 类 com.hmdp.config.WebExceptionAdvice
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[54,28] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.dto.UserDTO的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[64,43] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.dto.UserDTO的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[69,33] 找不到符号
+  符号:   方法 getUserId()
+  位置: 类型为com.hmdp.entity.Follow的变量 follow
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[73,35] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.entity.Post的变量 post
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[77,30] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.entity.Post的变量 post
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[108,43] 找不到符号
+  符号:   方法 getId()
+  位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[194,68] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.dto.UserDTO的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[201,13] 找不到符号
+  符号:   方法 setViewCount(java.lang.Long)
+  位置: 类型为com.hmdp.entity.Post的变量 post
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[209,43] 找不到符号
+  符号:   方法 getId()
+  位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[253,10] 找不到符号
+  符号:   方法 setList(java.util.List<com.hmdp.entity.Post>)
+  位置: 类型为com.hmdp.dto.ScrollResult的变量 r
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[254,10] 找不到符号
+  符号:   方法 setMinTime(long)
+  位置: 类型为com.hmdp.dto.ScrollResult的变量 r
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[255,10] 找不到符号
+  符号:   方法 setOffset(int)
+  位置: 类型为com.hmdp.dto.ScrollResult的变量 r
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[262,27] 找不到符号
+  符号:   方法 getUserId()
+  位置: 类型为com.hmdp.entity.Post的变量 post
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[264,26] 找不到符号
+  符号:   方法 getNickName()
+  位置: 类型为com.hmdp.entity.User的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[265,26] 找不到符号
+  符号:   方法 getIcon()
+  位置: 类型为com.hmdp.entity.User的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[276,27] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.dto.UserDTO的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[279,42] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.entity.Post的变量 post
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[282,13] 找不到符号
+  符号:   方法 setIsLike(boolean)
+  位置: 类型为com.hmdp.entity.Post的变量 post
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/FollowServiceImpl.java:[45,42] 找不到符号
+  符号:   方法 getId()
+  位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/FollowServiceImpl.java:[51,19] 找不到符号
+  符号:   方法 setUserId(java.lang.Long)
+  位置: 类型为com.hmdp.entity.Follow的变量 follow
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/FollowServiceImpl.java:[52,19] 找不到符号
+  符号:   方法 setFollowUserId(java.lang.Long)
+  位置: 类型为com.hmdp.entity.Follow的变量 follow
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/FollowServiceImpl.java:[74,41] 找不到符号
+  符号:   方法 getId()
+  位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/FollowServiceImpl.java:[87,41] 找不到符号
+  符号:   方法 getId()
+  位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/FollowServiceImpl.java:[106,21] 方法引用无效
+  找不到符号
+    符号:   方法 getId()
+    位置: 类 com.hmdp.entity.User
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/VoucherController.java:[34,33] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.entity.Voucher的变量 voucher
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/VoucherController.java:[46,33] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.entity.Voucher的变量 voucher
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/PostController.java:[46,28] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.dto.UserDTO的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/PostController.java:[50,30] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.entity.Post的变量 post
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/PostController.java:[64,36] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.dto.UserDTO的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/UploadController.java:[30,13] 找不到符号
+  符号:   变量 log
+  位置: 类 com.hmdp.controller.UploadController
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/UploadController.java:[57,13] 找不到符号
+  符号:   变量 log
+  位置: 类 com.hmdp.controller.UploadController
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/ProductServiceImpl.java:[193,56] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.entity.Product的变量 product
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/ProductServiceImpl.java:[204,26] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.entity.Product的变量 product
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/ProductServiceImpl.java:[212,75] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.entity.Product的变量 product
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/ProductServiceImpl.java:[242,18] 找不到符号
+  符号:   方法 setExpireTime(java.time.LocalDateTime)
+  位置: 类型为com.hmdp.utils.RedisData的变量 redisData
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/ProductServiceImpl.java:[243,18] 找不到符号
+  符号:   方法 setData(com.hmdp.entity.Product)
+  位置: 类型为com.hmdp.utils.RedisData的变量 redisData
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/CacheClient.java:[51,18] 找不到符号
+  符号:   方法 setData(java.lang.Object)
+  位置: 类型为com.hmdp.utils.RedisData的变量 redisData
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/CacheClient.java:[52,18] 找不到符号
+  符号:   方法 setExpireTime(java.time.LocalDateTime)
+  位置: 类型为com.hmdp.utils.RedisData的变量 redisData
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/CacheClient.java:[115,53] 找不到符号
+  符号:   方法 getData()
+  位置: 类型为com.hmdp.utils.RedisData的变量 redisData
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/CacheClient.java:[116,45] 找不到符号
+  符号:   方法 getExpireTime()
+  位置: 类型为com.hmdp.utils.RedisData的变量 redisData
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/CacheClient.java:[131,31] 找不到符号
+  符号:   方法 getExpireTime()
+  位置: 类型为com.hmdp.utils.RedisData的变量 redisData1
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/CacheClient.java:[134,67] 找不到符号
+  符号:   方法 getData()
+  位置: 类型为com.hmdp.utils.RedisData的变量 redisData1
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/RefreshTokenInterceptor.java:[45,65] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.hmdp.dto.UserDTO的变量 userDTO
+[INFO] 77 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  4.050 s
+[INFO] Finished at: 2026-02-27T00:08:27+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.10.1:compile (default-compile) on project hmdp: Compilation failure: Compilation failure: 
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/ShopGeoDataLoader.java:[27,8] 类 ProductGeoDataLoader 是公共的, 应在名为 ProductGeoDataLoader.java 的文件中声明
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/UserController.java:[82,13] 找不到符号
+[ERROR]   符号:   方法 setCreateTime(<nulltype>)
+[ERROR]   位置: 类型为com.hmdp.entity.UserInfo的变量 info
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/UserController.java:[83,13] 找不到符号
+[ERROR]   符号:   方法 setUpdateTime(<nulltype>)
+[ERROR]   位置: 类型为com.hmdp.entity.UserInfo的变量 info
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/UserController.java:[95,48] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/dto/Result.java:[19,16] 无法将类 com.hmdp.dto.Result中的构造器 Result应用到给定类型;
+[ERROR]   需要: 没有参数
+[ERROR]   找到:    boolean,<nulltype>,<nulltype>,<nulltype>
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/dto/Result.java:[22,16] 无法将类 com.hmdp.dto.Result中的构造器 Result应用到给定类型;
+[ERROR]   需要: 没有参数
+[ERROR]   找到:    boolean,<nulltype>,java.lang.Object,<nulltype>
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/dto/Result.java:[25,16] 无法将类 com.hmdp.dto.Result中的构造器 Result应用到给定类型;
+[ERROR]   需要: 没有参数
+[ERROR]   找到:    boolean,<nulltype>,java.util.List<capture#1, 共 ?>,java.lang.Long
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/dto/Result.java:[28,16] 无法将类 com.hmdp.dto.Result中的构造器 Result应用到给定类型;
+[ERROR]   需要: 没有参数
+[ERROR]   找到:    boolean,java.lang.String,<nulltype>,<nulltype>
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherServiceImpl.java:[51,44] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.entity.Voucher的变量 voucher
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherServiceImpl.java:[52,40] 找不到符号
+[ERROR]   符号:   方法 getStock()
+[ERROR]   位置: 类型为com.hmdp.entity.Voucher的变量 voucher
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherServiceImpl.java:[53,44] 找不到符号
+[ERROR]   符号:   方法 getBeginTime()
+[ERROR]   位置: 类型为com.hmdp.entity.Voucher的变量 voucher
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherServiceImpl.java:[54,42] 找不到符号
+[ERROR]   符号:   方法 getEndTime()
+[ERROR]   位置: 类型为com.hmdp.entity.Voucher的变量 voucher
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherServiceImpl.java:[59,86] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.entity.Voucher的变量 voucher
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherServiceImpl.java:[59,102] 找不到符号
+[ERROR]   符号:   方法 getStock()
+[ERROR]   位置: 类型为com.hmdp.entity.Voucher的变量 voucher
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/UserServiceImpl.java:[53,12] 无法将接口 org.apache.ibatis.logging.Log中的方法 debug应用到给定类型;
+[ERROR]   需要: java.lang.String
+[ERROR]   找到:    java.lang.String,java.lang.String,java.lang.String
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/UserServiceImpl.java:[59,33] 找不到符号
+[ERROR]   符号:   方法 getPhone()
+[ERROR]   位置: 类型为com.hmdp.dto.LoginFormDTO的变量 loginForm
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/UserServiceImpl.java:[64,32] 找不到符号
+[ERROR]   符号:   方法 getCode()
+[ERROR]   位置: 类型为com.hmdp.dto.LoginFormDTO的变量 loginForm
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/UserServiceImpl.java:[91,13] 找不到符号
+[ERROR]   符号:   方法 setPhone(java.lang.String)
+[ERROR]   位置: 类型为com.hmdp.entity.User的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/UserServiceImpl.java:[92,13] 找不到符号
+[ERROR]   符号:   方法 setNickName(java.lang.String)
+[ERROR]   位置: 类型为com.hmdp.entity.User的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/UserServiceImpl.java:[101,29] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.dto.UserDTO的变量 loginUser
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/UserServiceImpl.java:[130,43] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/UserServiceImpl.java:[150,43] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/ShopGeoDataLoader.java:[41,84] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 getTypeId()
+[ERROR]     位置: 类 com.hmdp.entity.Product
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/ShopGeoDataLoader.java:[56,42] 找不到符号
+[ERROR]   符号:   方法 getX()
+[ERROR]   位置: 类型为com.hmdp.entity.Product的变量 product
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/ShopGeoDataLoader.java:[56,58] 找不到符号
+[ERROR]   符号:   方法 getY()
+[ERROR]   位置: 类型为com.hmdp.entity.Product的变量 product
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/ShopGeoDataLoader.java:[55,32] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.entity.Product的变量 product
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/ShopGeoDataLoader.java:[60,9] 找不到符号
+[ERROR]   符号:   变量 log
+[ERROR]   位置: 类 com.hmdp.config.ProductGeoDataLoader
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherOrderServiceImpl.java:[197,43] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherOrderServiceImpl.java:[294,21] 找不到符号
+[ERROR]   符号:   方法 setId(long)
+[ERROR]   位置: 类型为com.hmdp.entity.VoucherOrder的变量 voucherOrder
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherOrderServiceImpl.java:[296,43] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherOrderServiceImpl.java:[297,21] 找不到符号
+[ERROR]   符号:   方法 setUserId(java.lang.Long)
+[ERROR]   位置: 类型为com.hmdp.entity.VoucherOrder的变量 voucherOrder
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherOrderServiceImpl.java:[299,21] 找不到符号
+[ERROR]   符号:   方法 setVoucherId(java.lang.Long)
+[ERROR]   位置: 类型为com.hmdp.entity.VoucherOrder的变量 voucherOrder
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/ProductController.java:[50,33] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.entity.Product的变量 product
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/WebExceptionAdvice.java:[14,9] 找不到符号
+[ERROR]   符号:   变量 log
+[ERROR]   位置: 类 com.hmdp.config.WebExceptionAdvice
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[54,28] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.dto.UserDTO的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[64,43] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.dto.UserDTO的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[69,33] 找不到符号
+[ERROR]   符号:   方法 getUserId()
+[ERROR]   位置: 类型为com.hmdp.entity.Follow的变量 follow
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[73,35] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.entity.Post的变量 post
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[77,30] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.entity.Post的变量 post
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[108,43] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[194,68] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.dto.UserDTO的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[201,13] 找不到符号
+[ERROR]   符号:   方法 setViewCount(java.lang.Long)
+[ERROR]   位置: 类型为com.hmdp.entity.Post的变量 post
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[209,43] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[253,10] 找不到符号
+[ERROR]   符号:   方法 setList(java.util.List<com.hmdp.entity.Post>)
+[ERROR]   位置: 类型为com.hmdp.dto.ScrollResult的变量 r
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[254,10] 找不到符号
+[ERROR]   符号:   方法 setMinTime(long)
+[ERROR]   位置: 类型为com.hmdp.dto.ScrollResult的变量 r
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[255,10] 找不到符号
+[ERROR]   符号:   方法 setOffset(int)
+[ERROR]   位置: 类型为com.hmdp.dto.ScrollResult的变量 r
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[262,27] 找不到符号
+[ERROR]   符号:   方法 getUserId()
+[ERROR]   位置: 类型为com.hmdp.entity.Post的变量 post
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[264,26] 找不到符号
+[ERROR]   符号:   方法 getNickName()
+[ERROR]   位置: 类型为com.hmdp.entity.User的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[265,26] 找不到符号
+[ERROR]   符号:   方法 getIcon()
+[ERROR]   位置: 类型为com.hmdp.entity.User的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[276,27] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.dto.UserDTO的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[279,42] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.entity.Post的变量 post
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/PostServiceImpl.java:[282,13] 找不到符号
+[ERROR]   符号:   方法 setIsLike(boolean)
+[ERROR]   位置: 类型为com.hmdp.entity.Post的变量 post
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/FollowServiceImpl.java:[45,42] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/FollowServiceImpl.java:[51,19] 找不到符号
+[ERROR]   符号:   方法 setUserId(java.lang.Long)
+[ERROR]   位置: 类型为com.hmdp.entity.Follow的变量 follow
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/FollowServiceImpl.java:[52,19] 找不到符号
+[ERROR]   符号:   方法 setFollowUserId(java.lang.Long)
+[ERROR]   位置: 类型为com.hmdp.entity.Follow的变量 follow
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/FollowServiceImpl.java:[74,41] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/FollowServiceImpl.java:[87,41] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类 com.hmdp.dto.UserDTO
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/FollowServiceImpl.java:[106,21] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 getId()
+[ERROR]     位置: 类 com.hmdp.entity.User
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/VoucherController.java:[34,33] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.entity.Voucher的变量 voucher
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/VoucherController.java:[46,33] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.entity.Voucher的变量 voucher
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/PostController.java:[46,28] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.dto.UserDTO的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/PostController.java:[50,30] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.entity.Post的变量 post
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/PostController.java:[64,36] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.dto.UserDTO的变量 user
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/UploadController.java:[30,13] 找不到符号
+[ERROR]   符号:   变量 log
+[ERROR]   位置: 类 com.hmdp.controller.UploadController
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/controller/UploadController.java:[57,13] 找不到符号
+[ERROR]   符号:   变量 log
+[ERROR]   位置: 类 com.hmdp.controller.UploadController
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/ProductServiceImpl.java:[193,56] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.entity.Product的变量 product
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/ProductServiceImpl.java:[204,26] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.entity.Product的变量 product
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/ProductServiceImpl.java:[212,75] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.entity.Product的变量 product
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/ProductServiceImpl.java:[242,18] 找不到符号
+[ERROR]   符号:   方法 setExpireTime(java.time.LocalDateTime)
+[ERROR]   位置: 类型为com.hmdp.utils.RedisData的变量 redisData
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/ProductServiceImpl.java:[243,18] 找不到符号
+[ERROR]   符号:   方法 setData(com.hmdp.entity.Product)
+[ERROR]   位置: 类型为com.hmdp.utils.RedisData的变量 redisData
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/CacheClient.java:[51,18] 找不到符号
+[ERROR]   符号:   方法 setData(java.lang.Object)
+[ERROR]   位置: 类型为com.hmdp.utils.RedisData的变量 redisData
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/CacheClient.java:[52,18] 找不到符号
+[ERROR]   符号:   方法 setExpireTime(java.time.LocalDateTime)
+[ERROR]   位置: 类型为com.hmdp.utils.RedisData的变量 redisData
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/CacheClient.java:[115,53] 找不到符号
+[ERROR]   符号:   方法 getData()
+[ERROR]   位置: 类型为com.hmdp.utils.RedisData的变量 redisData
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/CacheClient.java:[116,45] 找不到符号
+[ERROR]   符号:   方法 getExpireTime()
+[ERROR]   位置: 类型为com.hmdp.utils.RedisData的变量 redisData
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/CacheClient.java:[131,31] 找不到符号
+[ERROR]   符号:   方法 getExpireTime()
+[ERROR]   位置: 类型为com.hmdp.utils.RedisData的变量 redisData1
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/CacheClient.java:[134,67] 找不到符号
+[ERROR]   符号:   方法 getData()
+[ERROR]   位置: 类型为com.hmdp.utils.RedisData的变量 redisData1
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/RefreshTokenInterceptor.java:[45,65] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.hmdp.dto.UserDTO的变量 userDTO
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

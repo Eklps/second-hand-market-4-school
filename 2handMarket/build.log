@@ -1,0 +1,62 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------------< com.chen:hmdp >----------------------------
+[INFO] Building hmdp 1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ hmdp ---
+[INFO] Deleting E:\DianPing\secondHandMarket\2handMarket\target
+[INFO] 
+[INFO] --- resources:3.2.0:resources (default-resources) @ hmdp ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] Copying 1 resource
+[INFO] Copying 120 resources
+[INFO] 
+[INFO] --- compiler:3.10.1:compile (default-compile) @ hmdp ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 72 source files to E:\DianPing\secondHandMarket\2handMarket\target\classes
+[INFO] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/SimpleRedisLock.java: E:\DianPing\secondHandMarket\2handMarket\src\main\java\com\hmdp\utils\SimpleRedisLock.java使用或覆盖了已过时的 API。
+[INFO] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/utils/SimpleRedisLock.java: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。
+[INFO] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherOrderServiceImpl.java: E:\DianPing\secondHandMarket\2handMarket\src\main\java\com\hmdp\service\impl\VoucherOrderServiceImpl.java使用了未经检查或不安全的操作。
+[INFO] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/VoucherOrderServiceImpl.java: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/RedissonConfig.java:[17,33] 找不到符号
+  符号:   方法 setLocation(java.lang.String)
+  位置: 类 org.redisson.config.SingleServerConfig
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/ProductServiceImpl.java:[181,54] 找不到符号
+  符号:   方法 getTitle()
+  位置: 类 org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation<java.lang.String>
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/ProductGeoDataLoader.java:[41,84] 方法引用无效
+  找不到符号
+    符号:   方法 getTypeId()
+    位置: 类 com.hmdp.entity.Product
+[INFO] 3 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  5.930 s
+[INFO] Finished at: 2026-02-27T00:24:17+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.10.1:compile (default-compile) on project hmdp: Compilation failure: Compilation failure: 
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/RedissonConfig.java:[17,33] 找不到符号
+[ERROR]   符号:   方法 setLocation(java.lang.String)
+[ERROR]   位置: 类 org.redisson.config.SingleServerConfig
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/service/impl/ProductServiceImpl.java:[181,54] 找不到符号
+[ERROR]   符号:   方法 getTitle()
+[ERROR]   位置: 类 org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation<java.lang.String>
+[ERROR] /E:/DianPing/secondHandMarket/2handMarket/src/main/java/com/hmdp/config/ProductGeoDataLoader.java:[41,84] 方法引用无效
+[ERROR]   找不到符号
+[ERROR]     符号:   方法 getTypeId()
+[ERROR]     位置: 类 com.hmdp.entity.Product
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
