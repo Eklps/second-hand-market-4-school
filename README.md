@@ -1,2 +1,9 @@
-# second-hand-market-4-school
-基于 SpringBoot + Redis 的校园二手交易平台，深度集成高并发秒杀逻辑与 Feed 流社区交互，实现从 O2O 到校园 C2C 的全栈业务转型。
+项目名称： Campus-2Hand-Market（校缘二手）
+
+项目简介： 本项目是一款基于 SpringBoot 和 Redis 架构的校内 C2C 二手交易系统。通过对“黑马点评”核心逻辑的深度重构与业务迁移（Domain Shift），将原有的商铺评价体系优化为“二手商品+社区动态”的双驱动模式。系统不仅支持基础的商品发布、分类搜索与地理位置展示，还保留并适配了高性能秒杀组件，用于校园官方福利与预约抽奖场景。
+
+核心技术亮点：
+
+高并发抗压：利用 Redis Lua 脚本与 Redisson 分布式锁解决秒杀超卖，通过 Redis Stream 异步解耦实现订单快速入库。
+社区交互：基于推拉结合模式实现 Feed 流动态推送，并利用 HyperLogLog 实现百万级帖子的 unique visitor 统计。
+性能优化：通过 Redis GEO 实现校内交易点的距离排序，多层拦截器设计平衡了权限校验与响应速度。
