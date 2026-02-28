@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+  <title>黑马点评</title>
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="./css/element.css">
+
+  <link href="./css/shop-detail.css" rel="stylesheet">
+  <link href="./css/main.css" rel="stylesheet">
+
+  <style type="text/css">
+
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div class="header">
+      <div class="header-back-btn" @click="goBack"><i class="el-icon-arrow-left"></i></div>
+      <div class="header-title"></div>
+      <div class="header-share">...</div>
+    </div>
+    <div class="top-bar"></div>
+    <div class="shop-info-box">
+      <div class="shop-title">{{shop.title}}</div>
+
+      <div class="shop-images">
+        <div v-for="(s,i) in shop.images" :key="i">
+          <img :src="s" alt="">
+        </div>
+      </div>
+      <div class="shop-address">
+        <div><i class="el-icon-map-location"></i></div>
+        <span>{{shop.location}}</span>
+        <div style="width: 10px; flex-grow: 2; text-align: center; color: #e1e2e3">|</div>
+        <!-- 添加状态标签 -->
+        <span v-if="shop.status !== undefined" class="status-badge"
+          :style="shop.status === 0 ? 'color: #52c41a; background: #f6ffed; border: 1px solid #b7eb8f; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 5px;' : (shop.status === 1 ? 'color: #fa8c16; background: #fff7e6; border: 1px solid #ffd591; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 5px;' : 'color: #8c8c8c; background: #f5f5f5; border: 1px solid #d9d9d9; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 5px;')">
+          {{ shop.status === 0 ? '待售' : (shop.status === 1 ? '已预订' : '已售出') }}
+        </span>
+        <div style="margin: 0 5px"><img
+            src="https://p0.meituan.net/travelcube/bf684aa196c870810655e45b1e52ce843484.png@24w_16h_40q" alt=""></div>
+        <div><img src="https://p0.meituan.net/travelcube/9277ace32123e0c9f59dedf4407892221566.png@24w_24h_40q" alt="">
+        </div>
+      </div>
+
+      <!-- 价格和划线价展示 -->
+      <div style="margin-top: 10px; padding-bottom: 5px;">
+        <span style="color: #ff4d4f; font-size: 20px; font-weight: bold;">￥{{shop.price}}</span>
+        <span v-if="shop.originalPrice"
+          style="color: #999; font-size: 14px; text-decoration: line-through; margin-left: 8px;">￥{{shop.originalPrice}}</span>
+      </div>
+
+      <!-- 详细描述展示区域 -->
+      <div v-if="shop.description"
+        style="margin-top: 10px; padding: 10px; background: #fafafa; border-radius: 8px; font-size: 14px; color: #666; line-height: 1.6;">
+        <strong>描述: </strong><br />
+        {{shop.description}}
+      </div>
+    </div>
+    <div class="shop-divider"></div>
+
+    <div class="shop-voucher">
+      <div>
+        <span class="voucher-icon" style="background-color: #ff6633; color: white;">福</span>
+        <span style="font-weight: bold;">官方福利盲盒 / 毕业季秒杀集市</span>
+      </div>
+      <div class="voucher-box" v-for="v in vouchers" :key="v.id" v-if="!isEnd(v)">
+        <div class="voucher-circle">
+          <div class="voucher-b"></div>
+          <div class="voucher-b"></div>
+          <div class="voucher-b"></div>
+        </div>
+        <div class="voucher-left">
+          <div class="voucher-title">{{v.title}}</div>
+          <div class="voucher-subtitle">{{v.subTitle}}</div>
+          <div class="voucher-price">
+            <div>￥ {{util.formatPrice(v.payValue)}}</div> <span>{{(v.payValue*10)/v.actualValue}}折</span>
+          </div>
+        </div>
+        <div class="voucher-right">
+          <div v-if="v.type" class="seckill-box">
+            <div class="voucher-btn" :class="{'disable-btn': isNotBegin(v) || v.stock < 1}" @click="seckill(v)">限时抢购
+            </div>
+            <div class="seckill-stock">剩余 <span>{{v.stock}}</span> 张</div>
+            <div class="seckill-time">{{formatTime(v)}}</div>
+          </div>
+          <div class="voucher-btn" v-else>抢购</div>
+        </div>
+      </div>
+    </div>
+    <div class="shop-divider"></div>
+    <div class="shop-comments" v-if="comments && comments.length > 0">
+      <div class="comments-head">
+        <div>相关话题留言 <span>（{{comments.length}}）</span></div>
+        <div><i class="el-icon-arrow-right"></i></div>
+      </div>
+      <div class="comment-list">
+        <div class="comment-box" v-for="c in comments" :key="c.id">
+          <div class="comment-icon">
+            <img
+              :src="c.icon || '/imgs/icons/default-icon.png'"
+              alt="">
+          </div>
+          <div class="comment-info">
+            <div class="comment-user">{{c.name}}</div>
+            <div style="padding: 5px 0; font-size: 14px; color: #333;">
+              {{c.content}}
+            </div>
+            <div class="comment-images" v-if="c.images">
+              <img v-for="(img, idx) in c.images.split(',')" :key="idx" :src="img" alt="" v-if="img">
+            </div>
+            <div style="color: #999; font-size: 12px; margin-top: 5px;">
+              浏览{{c.viewCount || 0}} &nbsp;&nbsp;&nbsp;&nbsp;点赞{{c.liked}} &nbsp;&nbsp;&nbsp;&nbsp;评论{{c.comments}}
+            </div>
+          </div>
+        </div>
+        <div
+          style="display: flex; justify-content: space-between;padding: 15px 0; border-top: 1px solid #f1f1f1; margin-top: 10px; color: #999;">
+          <div>查看全部{{comments.length}}条留言</div>
+          <div><i class="el-icon-arrow-right"></i></div>
+        </div>
+      </div>
+    </div>
+    <div class="shop-divider"></div>
+    <div class="copyright">
+      copyright ©2021 hmdp.com
+    </div>
+  </div>
+  <script src="./js/vue.js"></script>
+  <script src="./js/axios.min.js"></script>
+  <!-- 引入组件库 -->
+  <script src="./js/element.js"></script>
+  <script src="./js/common.js"></script>
+  <script>
+
+    const app = new Vue({
+      el: "#app",
+      data: {
+        util,
+        shop: {},
+        vouchers: [],
+        comments: []
+      },
+      created() {
+        // 获取参数
+        let shopId = util.getUrlParam("id");
+        // 查询酒店信息
+        this.queryShopById(shopId);
+        // 查询优惠券信息
+        this.queryVoucher(shopId);
+        // 查询留言
+        this.queryComments(shopId);
+      },
+      methods: {
+        goBack() {
+          history.back();
+        },
+        queryShopById(shopId) {
+          axios.get("/product/" + shopId)
+            .then(({ data }) => {
+              data.images = data.images.split(",")
+              this.shop = data
+            })
+            .catch(this.$message.error)
+        },
+        queryVoucher(shopId) {
+          axios.get("/voucher/list/" + shopId)
+            .then(({ data }) => {
+              this.vouchers = data;
+            })
+            .catch(this.$message.error)
+        },
+        queryComments(shopId) {
+          axios.get("/post/of/product/" + shopId)
+            .then(({ data }) => {
+              // 处理返回的关联动态帖子
+              if (data) {
+                this.comments = data;
+              }
+            })
+            // 忽略报错，因为有些商品可能没有关联帖子
+            .catch(err => console.log("没有评论: " + err));
+        },
+        formatTime(v) {
+          let b = new Date(v.beginTime);
+          let e = new Date(v.endTime);
+          return b.getMonth() + 1 + "月" + b.getDate() + "日 "
+            + b.getHours() + ":" + this.formatMinutes(b.getMinutes())
+            + " ~ "/*  + e.getMonth() + 1 + "月" + e.getDate() + "日 " */
+            + e.getHours() + ":" + this.formatMinutes(e.getMinutes());
+        },
+        formatMinutes(m) {
+          if (m < 10) m = "0" + m
+          return m;
+        },
+        isNotBegin(v) {
+          return new Date(v.beginTime).getTime() > new Date().getTime();
+        },
+        isEnd(v) {
+          return new Date(v.endTime).getTime() < new Date().getTime();
+        },
+        seckill(v) {
+          if (!token) {
+            this.$message.error("请先登录")
+            // 未登录，跳转
+            setTimeout(() => {
+              location.href = "/login.html"
+            }, 200);
+            return;
+          }
+          if (this.isNotBegin(v)) {
+            this.$message.error("优惠券抢购尚未开始！")
+            return;
+          }
+          if (this.isEnd(v)) {
+            this.$message.error("优惠券抢购已经结束！")
+            return;
+          }
+          if (v.stock < 1) {
+            this.$message.error("库存不足，请刷新再试试！")
+            return;
+          }
+          let id = v.id;
+          // 秒杀抢购
+          axios.post("/voucher-order/seckill/" + id)
+            .then(({ data }) => {
+              // 抢购成功，这里输出订单id，支付功能TODO
+              this.$message.success("抢购成功，订单id：" + data)
+            })
+            .catch(this.$message.error)
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

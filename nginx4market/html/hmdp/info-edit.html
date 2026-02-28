@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+  <title>黑马点评</title>
+  <!-- 引入样式 -->
+  <link rel="stylesheet" href="./css/element.css">
+  <link href="./css/main.css" rel="stylesheet">
+  <link href="./css/info.css" rel="stylesheet">
+
+  <style type="text/css">
+    .info-item {
+      cursor: pointer;
+    }
+
+    .info-item:active {
+      background-color: #f5f5f5;
+    }
+
+    .gender-radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 10px 0;
+    }
+
+    .gender-radio-group label {
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .gender-radio-group input[type="radio"] {
+      margin-right: 8px;
+      width: 18px;
+      height: 18px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <div class="header">
+      <div class="header-back-btn" @click="goBack"><i class="el-icon-arrow-left"></i></div>
+      <div class="header-title">资料编辑&nbsp;&nbsp;&nbsp;</div>
+    </div>
+    <div class="edit-container">
+      <div class="info-box">
+        <!-- 头像修改：通过隐藏的 file input 实现 -->
+        <div class="info-item" @click="openFileInput">
+          <div class="info-label">头像</div>
+          <div class="info-btn">
+            <img width="35" height="35" style="object-fit: cover; border-radius: 50%;"
+              :src="user.icon || '/imgs/icons/default-icon.png'" alt="">
+            <div><i class="el-icon-arrow-right"></i></div>
+          </div>
+          <input type="file" ref="fileInput" @change="uploadIcon" accept="image/*" style="display: none;">
+        </div>
+        <div class="divider"></div>
+        <div class="info-item" @click="editNickName">
+          <div class="info-label">昵称</div>
+          <div class="info-btn">
+            <div>{{user.nickName}}</div>
+            <div>
+              <i class="el-icon-arrow-right"></i>
+            </div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="info-item" @click="editIntroduce">
+          <div class="info-label">个人介绍</div>
+          <div class="info-btn">
+            <div style="overflow: hidden; width: 150px;text-align: right">{{info.introduce || '介绍一下自己'}}</div>
+            <div>
+              <i class="el-icon-arrow-right"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="info-box">
+        <div class="info-item" @click="editGender">
+          <div class="info-label">性别</div>
+          <div class="info-btn">
+            <div>{{genderText}}</div>
+            <div><i class="el-icon-arrow-right"></i></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="info-item" @click="editCity">
+          <div class="info-label">城市</div>
+          <div class="info-btn">
+            <div>{{info.city || '选择'}}</div>
+            <div><i class="el-icon-arrow-right"></i></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="info-item" @click="editBirthday">
+          <div class="info-label">生日</div>
+          <div class="info-btn">
+            <div>{{info.birthday || '添加'}}</div>
+            <div><i class="el-icon-arrow-right"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <div class="info-item">
+          <div class="info-label">我的积分</div>
+          <div class="info-btn">
+            <div>查看积分</div>
+            <div><i class="el-icon-arrow-right"></i></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="info-item">
+          <div class="info-label">会员等级</div>
+          <div class="info-btn">
+            <div><a href="javascript:void(0)">成为VIP尊享特权</a></div>
+            <div><i class="el-icon-arrow-right"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <foot-bar :active-btn="4"></foot-bar>
+  </div>
+  <script src="./js/vue.js"></script>
+  <script src="./js/axios.min.js"></script>
+  <!-- 引入组件库 -->
+  <script src="./js/element.js"></script>
+  <script src="./js/common.js"></script>
+  <script src="./js/footer.js"></script>
+  <script>
+
+    const app = new Vue({
+      el: "#app",
+      data: {
+        user: "",
+        info: {},
+      },
+      computed: {
+        genderText() {
+          let g = this.info.gender;
+          if (g === 0 || g === false || String(g) === 'false') return '男';
+          if (g === 1 || g === true || String(g) === 'true') return '女';
+          return '选择';
+        }
+      },
+      created() {
+        this.checkLogin();
+      },
+      methods: {
+        checkLogin() {
+          // 查询用户基础信息
+          axios.get("/user/me")
+            .then(({ data }) => {
+              this.user = data;
+              // 拉取最新详细资料
+              return axios.get("/user/info/" + data.id);
+            })
+            .then(({ data }) => {
+              this.info = data || JSON.parse(sessionStorage.getItem("userInfo")) || {};
+              // 同步更新 sessionStorage
+              if (data) {
+                sessionStorage.setItem("userInfo", JSON.stringify(data));
+              }
+            })
+            .catch(err => {
+              // 详细资料接口失败时兜底 sessionStorage
+              if (this.user) {
+                this.info = JSON.parse(sessionStorage.getItem("userInfo")) || {};
+              } else {
+                this.$message.error(err);
+                setTimeout(() => location.href = "login.html", 1000);
+              }
+            })
+        },
+        // 刷新用户数据（编辑成功后调用）
+        refreshUser() {
+          axios.get("/user/me")
+            .then(({ data }) => {
+              this.user = data;
+              return axios.get("/user/info/" + data.id);
+            })
+            .then(({ data }) => {
+              if (data) {
+                this.info = data;
+                sessionStorage.setItem("userInfo", JSON.stringify(data));
+              }
+            })
+            .catch(() => { })
+        },
+        // ========== 头像上传方法 ==========
+        openFileInput() {
+          this.$refs.fileInput.click();
+        },
+        uploadIcon(e) {
+          let file = e.target.files[0];
+          if (!file) return;
+
+          // 1. 准备 FormData
+          const formData = new FormData();
+          formData.append("file", file);
+
+          // 2. 上传图片到服务器
+          const loading = this.$loading({
+            text: '正在上传头像...',
+            background: 'rgba(0, 0, 0, 0.7)'
+          });
+
+          axios.post("/upload/icon", formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }).then(({ data }) => {
+            // data 是返回的文件路径，例如 /icons/xxx.jpg
+            // 3. 加上 /imgs 前缀，与 Nginx 静态资源路径对齐
+            return axios.post("/user/update", { icon: "/imgs" + data });
+          }).then(() => {
+            this.$message.success('头像修改成功');
+            loading.close();
+            this.refreshUser(); // 刷新数据
+          }).catch(err => {
+            loading.close();
+            this.$message.error(err || '头像修改失败');
+          }).finally(() => {
+            // 清空 input，以便下次选择同一张图片时仍能触发 change 事件
+            e.target.value = '';
+          });
+        },
+        // ========== 编辑方法 ==========
+        // 编辑昵称 -> 接口 A
+        editNickName() {
+          this.$prompt('请输入新昵称', '修改昵称', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            inputValue: this.user.nickName || '',
+            inputPattern: /\S+/,
+            inputErrorMessage: '昵称不能为空'
+          }).then(({ value }) => {
+            return axios.post("/user/update", { nickName: value.trim() });
+          }).then(() => {
+            this.$message.success('昵称修改成功');
+            this.refreshUser();
+          }).catch((err) => {
+            if (err !== 'cancel') {
+              this.$message.error(err || '修改失败');
+            }
+          });
+        },
+        // 编辑个人介绍 -> 接口 B
+        editIntroduce() {
+          this.$prompt('请输入个人介绍（128字以内）', '修改个人介绍', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            inputValue: this.info.introduce || '',
+            inputType: 'textarea',
+            inputValidator: (val) => {
+              if (!val || !val.trim()) return '个人介绍不能为空';
+              if (val.length > 128) return '个人介绍不能超过128个字';
+              return true;
+            }
+          }).then(({ value }) => {
+            return axios.post("/user/info", { introduce: value.trim() });
+          }).then(() => {
+            this.$message.success('个人介绍修改成功');
+            this.refreshUser();
+          }).catch((err) => {
+            if (err !== 'cancel') {
+              this.$message.error(err || '修改失败');
+            }
+          });
+        },
+        // 编辑性别 -> 接口 B
+        editGender() {
+          let cg = this.info.gender;
+          let currentGender = -1;
+          if (cg === 0 || cg === false || String(cg) === 'false') currentGender = 0;
+          else if (cg === 1 || cg === true || String(cg) === 'true') currentGender = 1;
+
+          const h = this.$createElement;
+          this.$msgbox({
+            title: '选择性别',
+            message: h('div', { class: 'gender-radio-group' }, [
+              h('label', [
+                h('input', {
+                  attrs: { type: 'radio', name: 'gender', value: '0' },
+                  domProps: { checked: currentGender === 0 }
+                }),
+                '男'
+              ]),
+              h('label', [
+                h('input', {
+                  attrs: { type: 'radio', name: 'gender', value: '1' },
+                  domProps: { checked: currentGender === 1 }
+                }),
+                '女'
+              ])
+            ]),
+            showCancelButton: true,
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            beforeClose: (action, instance, done) => {
+              if (action === 'confirm') {
+                const checked = document.querySelector('.gender-radio-group input[name="gender"]:checked');
+                if (!checked) {
+                  this.$message.warning('请选择性别');
+                  return;
+                }
+                const gender = parseInt(checked.value);
+                axios.post("/user/info", { gender: gender })
+                  .then(() => {
+                    this.$message.success('性别修改成功');
+                    this.refreshUser();
+                    done();
+                  })
+                  .catch((err) => {
+                    this.$message.error(err || '修改失败');
+                    done();
+                  });
+              } else {
+                done();
+              }
+            }
+          }).catch(() => { });
+        },
+        // 编辑城市 -> 接口 B
+        editCity() {
+          this.$prompt('请输入城市名称', '修改城市', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            inputValue: this.info.city || '',
+            inputPattern: /\S+/,
+            inputErrorMessage: '城市不能为空'
+          }).then(({ value }) => {
+            return axios.post("/user/info", { city: value.trim() });
+          }).then(() => {
+            this.$message.success('城市修改成功');
+            this.refreshUser();
+          }).catch((err) => {
+            if (err !== 'cancel') {
+              this.$message.error(err || '修改失败');
+            }
+          });
+        },
+        // 编辑生日 -> 接口 B
+        editBirthday() {
+          const h = this.$createElement;
+          // 解析当前生日
+          let defaultDate = this.info.birthday ? new Date(this.info.birthday) : null;
+          let selectedDate = defaultDate;
+
+          this.$msgbox({
+            title: '选择生日',
+            message: h('div', { style: 'padding: 10px 0' }, [
+              h('el-date-picker', {
+                props: {
+                  type: 'date',
+                  placeholder: '请选择日期',
+                  value: defaultDate,
+                  format: 'yyyy-MM-dd',
+                  valueFormat: 'yyyy-MM-dd'
+                },
+                style: 'width: 100%',
+                on: {
+                  input: (val) => { selectedDate = val; }
+                }
+              })
+            ]),
+            showCancelButton: true,
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            beforeClose: (action, instance, done) => {
+              if (action === 'confirm') {
+                if (!selectedDate) {
+                  this.$message.warning('请选择生日日期');
+                  return;
+                }
+                // 格式化为 YYYY-MM-DD
+                let birthday = '';
+                if (typeof selectedDate === 'string') {
+                  birthday = selectedDate;
+                } else {
+                  const d = new Date(selectedDate);
+                  const y = d.getFullYear();
+                  const m = String(d.getMonth() + 1).padStart(2, '0');
+                  const day = String(d.getDate()).padStart(2, '0');
+                  birthday = `${y}-${m}-${day}`;
+                }
+                axios.post("/user/info", { birthday: birthday })
+                  .then(() => {
+                    this.$message.success('生日修改成功');
+                    this.refreshUser();
+                    done();
+                  })
+                  .catch((err) => {
+                    this.$message.error(err || '修改失败');
+                    done();
+                  });
+              } else {
+                done();
+              }
+            }
+          }).catch(() => { });
+        },
+        goBack() {
+          history.back();
+        }
+      },
+
+    })
+  </script>
+</body>
+
+</html>
