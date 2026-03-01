@@ -4,7 +4,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-  <title>黑马点评</title>
+  <title>大学城闲置星球</title>
   <!-- 引入样式 -->
   <link rel="stylesheet" href="./css/element.css">
   <link href="./css/main.css" rel="stylesheet">
@@ -46,7 +46,7 @@
       </div>
       <div class="basic-info">
         <div class="name">{{user.nickName}}</div>
-        <span>杭州</span>
+        <span>{{info.city || '未知'}}</span>
       </div>
       <div class="logout-btn" @click="follow" style="text-align: center">
         {{followed ? "取消关注" : "关注"}}
@@ -173,12 +173,22 @@
             })
         },
         follow() {
+          if (!this.user || !this.user.id) {
+            this.$message.error("用户信息加载中，请稍后再试");
+            return;
+          }
           axios.put("/follow/" + this.user.id + "/" + !this.followed)
-            .then(() => {
-              this.$message.success(this.followed ? "已取消关注" : "已关注")
-              this.followed = !this.followed
+            .then(({ data }) => {
+              if (data.success === false) {
+                this.$message.error(data.errorMsg);
+              } else {
+                this.$message.success(this.followed ? "已取消关注" : "已关注")
+                this.followed = !this.followed
+              }
             })
-            .catch(this.$message.error)
+            .catch(err => {
+              this.$message.error("操作失败，请先登录");
+            })
         },
         handleClick(t) {
           if (t.name === '2') {

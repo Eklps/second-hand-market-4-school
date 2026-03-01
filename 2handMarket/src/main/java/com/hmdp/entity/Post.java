@@ -37,6 +37,10 @@ public class Post implements Serializable {
      */
     private Long relatedId;
     /**
+     * 帖子分类id（1数码，2书籍，3生活，4服饰，5交通，6求购）
+     */
+    private Long categoryId;
+    /**
      * 用户id
      */
     private Long userId;
@@ -92,9 +96,35 @@ public class Post implements Serializable {
     private LocalDateTime updateTime;
 
     /**
+     * 所属校区
+     */
+    private String campus;
+
+    /**
+     * 详细位置
+     */
+    private String location;
+
+    /**
+     * 经度
+     */
+    private Double x;
+
+    /**
+     * 维度
+     */
+    private Double y;
+
+    /**
      * 浏览量（非数据库字段，由 HyperLogLog 统计）
      */
     @TableField(exist = false)
     private Long viewCount;
+
+    /**
+     * 距离（非数据库字段，由 Redis GEO 计算）
+     */
+    @TableField(exist = false)
+    private Double distance;
 
 }

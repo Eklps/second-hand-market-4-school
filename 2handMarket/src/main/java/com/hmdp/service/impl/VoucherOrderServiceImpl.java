@@ -187,8 +187,18 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
 
     // 将订单写入数据库
     private void handleVoucherOrder(VoucherOrder voucherOrder) {
-        // 这里直接写数据库，不需要再判断库存和一人一单（Lua 已经做过了）
-        save(voucherOrder);
+        // 1. 扣减数据库当中的秒杀库存
+        boolean success = seckillVoucherService.update()
+                .setSql("stock = stock - 1")
+                .eq("voucher_id", voucherOrder.getVoucherId())
+                .gt("stock", 0)
+                .update();
+        if (success) {
+            // 2. 创建订单数据
+            save(voucherOrder);
+        } else {
+            log.error("异步落库：库存扣减失败，或库存已被抢空！");
+        }
     }
 
     @Override

@@ -6,7 +6,7 @@ import com.hmdp.entity.Follow;
 
 /**
  * <p>
- *  服务类
+ * 服务类
  * </p>
  *
  * @author 虎哥
@@ -15,9 +15,13 @@ import com.hmdp.entity.Follow;
 public interface IFollowService extends IService<Follow> {
     Result followCommons(Long id);
 
-    //关注与取关
+    // 关注与取关
     Result follow(Long followUserId, Boolean isFollow);
 
-    //判断是否关注
+    // 判断是否关注
     Result isFollow(Long followUserId);
+
+    Result queryFollowers(Integer current);
+
+    Result queryFollowings(Integer current);
 }

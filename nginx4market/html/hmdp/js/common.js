@@ -4,10 +4,10 @@ let commonURL = "/api";
 axios.defaults.baseURL = commonURL;
 axios.defaults.timeout = 2000;
 // request拦截器，将用户token放入头中
-let token = sessionStorage.getItem("token");
 axios.interceptors.request.use(
   config => {
-    if(token) config.headers['authorization'] = token
+    let token = sessionStorage.getItem("token");
+    if (token) config.headers['authorization'] = token
     return config
   },
   error => {
@@ -24,7 +24,7 @@ axios.interceptors.response.use(function (response) {
 }, function (error) {
   // 一般是服务端异常或者网络异常
   console.log(error)
-  if(error.response.status == 401){
+  if (error.response.status == 401) {
     // 未登录，跳转
     setTimeout(() => {
       location.href = "/login.html"
@@ -33,14 +33,14 @@ axios.interceptors.response.use(function (response) {
   }
   return Promise.reject("服务器异常");
 });
-axios.defaults.paramsSerializer = function(params) {
+axios.defaults.paramsSerializer = function (params) {
   let p = "";
   Object.keys(params).forEach(k => {
-    if(params[k]){
+    if (params[k] !== undefined && params[k] !== null && params[k] !== "") {
       p = p + "&" + k + "=" + params[k]
     }
   })
-  return p;
+  return p.substring(1);
 }
 const util = {
   commonURL,

@@ -1,8 +1,12 @@
 package com.hmdp.controller;
 
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.hmdp.dto.Result;
+import com.hmdp.entity.PostComments;
+import com.hmdp.service.IPostCommentsService;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
 
 /**
  * <p>
@@ -15,5 +19,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/post-comments")
 public class PostCommentsController {
+
+    @Resource
+    private IPostCommentsService postCommentsService;
+
+    @GetMapping("/{postId}")
+    public Result queryCommentsByPostId(@PathVariable("postId") Long postId) {
+        return postCommentsService.queryCommentsByPostId(postId);
+    }
+
+    @PostMapping
+    public Result saveComment(@RequestBody PostComments comment) {
+        return postCommentsService.saveComment(comment);
+    }
 
 }

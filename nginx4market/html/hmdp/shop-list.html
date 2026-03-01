@@ -4,7 +4,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-  <title>黑马点评</title>
+  <title>大学城闲置星球</title>
   <!-- 引入样式 -->
   <link rel="stylesheet" href="./css/element.css">
 
@@ -49,7 +49,7 @@
       </div>
     </div>
     <div class="shop-list" v-if="shops.length > 0" @scroll="onScroll">
-      <div class="shop-box" v-for="s in shops" :key="s.id" @click="toDetail(s.id)">
+      <div class="shop-box" v-for="s in shops" :key="s.id" @click="toDetail(s)">
         <div class="shop-img"><img :src="s.images.split(',')[0]" alt=""></div>
         <div class="shop-info">
           <div class="shop-title">{{s.title}}</div>
@@ -61,6 +61,8 @@
           </div>
           <div class="shop-campus">
             <i class="el-icon-location-outline"></i> {{s.campus}}
+            <span v-if="s.distance" style="float: right; margin-right: 5px; color: #999; font-size: 11px;">
+              距您 {{s.distance < 1000 ? s.distance + 'm' : (s.distance/1000).toFixed(1) + 'km' }} </span>
           </div>
           <div class="shop-price">
             <span class="price-symbol">￥</span>
@@ -153,8 +155,12 @@
         goBack() {
           history.back();
         },
-        toDetail(id) {
-          location.href = "/shop-detail.html?id=" + id
+        toDetail(s) {
+          let url = "/shop-detail.html?id=" + s.id;
+          if (s.distance) {
+            url += "&distance=" + s.distance;
+          }
+          location.href = url;
         },
         onScroll(e) {
           let scrollTop = e.target.scrollTop;

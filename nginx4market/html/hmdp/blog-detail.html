@@ -21,6 +21,30 @@
     }
 
     .liked {}
+
+    /* 详情页位置信息条 */
+    .blog-location-bar {
+      display: flex;
+      align-items: center;
+      padding: 10px 15px;
+      background: #fafafa;
+      margin: 10px 15px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #666;
+      gap: 5px;
+    }
+
+    .blog-location-bar i {
+      color: #ff6633;
+      font-size: 16px;
+    }
+
+    .blog-location-bar .dist {
+      margin-left: auto;
+      color: #ff6633;
+      font-weight: bold;
+    }
   </style>
 </head>
 
@@ -32,11 +56,15 @@
       <div class="header-share">...</div>
     </div>
     <div style="height: 85%; overflow-y: scroll; overflow-x: hidden">
-      <div class="blog-info-box" ref="swiper" @touchstart="moveStart" @touchmove="moving" @touchend="moveEnd">
+      <!-- 有图时才显示轮播区域 -->
+      <div class="blog-info-box" ref="swiper" v-if="blog.images && blog.images.length > 0" @touchstart="moveStart"
+        @touchmove="moving" @touchend="moveEnd">
         <div class="swiper-item" v-for="(img, i) in blog.images" :key="i">
-          <img :src="img" alt="" style="width: 100%" height="100%">
+          <img :src="img" alt="">
         </div>
       </div>
+      <!-- 无图时补充顶部固定头部高度，防止内容被遥乱 -->
+      <div v-if="!blog.images || blog.images.length === 0" style="height: 6vh"></div>
       <div class="basic">
         <div class="basic-icon" @click="toOtherInfo">
           <img :src="blog.icon || '/imgs/icons/default-icon.png'" alt="">
@@ -52,16 +80,14 @@
         </div>
 
       </div>
-      <div class="blog-text" v-html="blog.content">
+      <!-- 位置显示条 -->
+      <div class="blog-location-bar" v-if="blog.campus">
+        <i class="el-icon-location"></i>
+        <span>{{blog.campus}} · {{blog.location}}</span>
+        <span class="dist" v-if="blog.distance">
+          {{blog.distance < 1000 ? blog.distance + 'm' : (blog.distance/1000).toFixed(1) + 'km' }} </span>
       </div>
-      <div class="shop-basic">
-        <div class="shop-icon">
-          <img :src="shop.image" alt="">
-        </div>
-        <div style="width: 80%">
-          <div class="name">{{shop.title}}</div>
-          <div class="shop-avg" style="margin-top: 5px; color: #ff6633; font-weight: bold;">￥{{shop.price}}</div>
-        </div>
+      <div class="blog-text" v-html="blog.content">
       </div>
       <div class="zan-box">
         <div>
@@ -83,50 +109,66 @@
       <div class="blog-divider"></div>
       <div class="blog-comments">
         <div class="comments-head">
-          <div>网友评价 <span>（119）</span></div>
+          <div>宝贝留言</div>
           <div><i class="el-icon-arrow-right"></i></div>
         </div>
         <div class="comment-list">
-          <div class="comment-box" v-for="i in 3" :key="i">
+          <div class="comment-box" v-for="c in comments" :key="c.id"
+            style="border-top: 1px solid #f1f1f1; padding-top: 10px;">
             <div class="comment-icon">
-              <img
-                src="https://p0.meituan.net/userheadpicbackend/57e44d6eba01aad0d8d711788f30a126549507.jpg%4048w_48h_1e_1c_1l%7Cwatermark%3D0"
-                alt="">
+              <img :src="c.icon || '/imgs/icons/default-icon.png'" alt="">
             </div>
             <div class="comment-info">
-              <div class="comment-user">叶小乙 <span>Lv5</span></div>
-              <div style="display: flex;">
-                打分
-                <el-rate disabled v-model="4.5"></el-rate>
+              <div class="comment-user">{{c.nickName}}</div>
+              <div style="padding: 5px 0; font-size: 14px; color: #666;">
+                {{c.content}}
               </div>
-              <div style="padding: 5px 0; font-size: 14px">
-                某平台上买的券，价格可以当工作餐吃，虽然价格便宜，但是这家店一点都没有...
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="color: #bbb; font-size: 12px;">
+                  {{formatTime(new Date(c.createTime))}}
+                </span>
+                <span style="color: #ff6633; font-size: 12px; cursor:pointer;" @click="startReply(c, c)">回复</span>
               </div>
-              <div class="comment-images">
-                <img
-                  src="https://qcloud.dpfile.com/pc/6T7MfXzx7USPIkSy7jzm40qZSmlHUF2jd-FZUL6WpjE9byagjLlrseWxnl1LcbuSGybIjx5eX6WNgCPvcASYAw.jpg"
-                  alt="">
-                <img
-                  src="https://qcloud.dpfile.com/pc/sZ5q-zgglv4VXEWU71xCFjnLM_jUHq-ylq0GKivtrz3JksWQ1f7oBWZsxm1DWgcaGybIjx5eX6WNgCPvcASYAw.jpg"
-                  alt="">
-                <img
-                  src="https://qcloud.dpfile.com/pc/xZy6W4NwuRFchlOi43DVLPFsx7KWWvPqifE1JTe_jreqdsBYA9CFkeSm2ZlF0OVmGybIjx5eX6WNgCPvcASYAw.jpg"
-                  alt="">
-                <img
-                  src="https://qcloud.dpfile.com/pc/xZy6W4NwuRFchlOi43DVLPFsx7KWWvPqifE1JTe_jreqdsBYA9CFkeSm2ZlF0OVmGybIjx5eX6WNgCPvcASYAw.jpg"
-                  alt="">
-              </div>
-              <div>
-                浏览641 &nbsp;&nbsp;&nbsp;&nbsp;评论5
+              <!-- 子回复列表 -->
+              <div v-if="c.children && c.children.length > 0" style="margin-top: 8px; padding-left: 0;">
+                <div v-for="r in c.children" :key="r.id"
+                  style="display:flex; gap:8px; padding: 8px 0; border-top: 1px dashed #f1f1f1;">
+                  <div style="flex-shrink:0; width:24px; height:24px; border-radius:50%; overflow:hidden;">
+                    <img :src="r.icon || '/imgs/icons/default-icon.png'" style="width:100%;height:100%;" alt="">
+                  </div>
+                  <div style="flex:1;">
+                    <div style="font-size:12px;">
+                      <span style="color:#333; font-weight:bold;">{{r.nickName}}</span>
+                      <span v-if="r.replyNickName" style="color:#999;"> 回复 </span>
+                      <span v-if="r.replyNickName" style="color:#ff6633;">@{{r.replyNickName}}</span>
+                    </div>
+                    <div style="font-size:13px; color:#666; margin-top:3px;">{{r.content}}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:3px;">
+                      <span style="color:#bbb; font-size:11px;">{{formatTime(new Date(r.createTime))}}</span>
+                      <span style="color:#ff6633; font-size:11px; cursor:pointer;" @click="startReply(c, r)">回复</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div
-            style="display: flex; justify-content: space-between;padding: 15px 0; border-top: 1px solid #f1f1f1; margin-top: 10px;">
-            <div>查看全部119条评价</div>
-            <div><i class="el-icon-arrow-right"></i></div>
+          <div v-if="comments.length === 0"
+            style="display: flex; justify-content: center; padding: 15px 0; border-top: 1px solid #f1f1f1; margin-top: 10px; color: #999; font-size: 13px;">
+            <div>暂无更多留言，快来咨询吧~</div>
           </div>
         </div>
+      </div>
+      <div class="blog-divider"></div>
+      <div style="padding: 10px 15px;">
+        <div v-if="replyTarget"
+          style="font-size:12px; color:#999; margin-bottom:5px; display:flex; justify-content:space-between;">
+          <span>回复 <span style="color:#ff6633;">@{{replyTarget.nickName}}</span></span>
+          <span style="color:#ff6633; cursor:pointer;" @click="cancelReply">取消</span>
+        </div>
+        <el-input :placeholder="replyTarget ? '回复 @' + replyTarget.nickName + '...' : '我要留言...'"
+          v-model="commentContent">
+          <el-button slot="append" @click="submitComment">发送</el-button>
+        </el-input>
       </div>
       <div class="blog-divider"></div>
     </div>
@@ -183,11 +225,16 @@
           y: 0
         },
         sensitivity: 60,
-        resistance: 0.3
+        resistance: 0.3,
+        comments: [],
+        commentContent: "",
+        replyTarget: null,
+        replyParent: null
       },
       created() {
         let id = util.getUrlParam("id");
         this.queryBlogById(id);
+        this.queryComments(id);
       },
       methods: {
         init() {
@@ -210,7 +257,17 @@
           }
         },
         queryBlogById(id) {
-          axios.get("/post/" + id)
+          // 获取当前选择的校区坐标进行计算
+          const campusStr = localStorage.getItem("currentCampusInfo");
+          let x = null;
+          let y = null;
+          if (campusStr) {
+            const info = JSON.parse(campusStr);
+            x = info.x;
+            y = info.y;
+          }
+
+          axios.get("/post/" + id + (x ? `?x=${x}&y=${y}` : ""))
             .then(({ data }) => {
               data.images = data.images ? data.images.split(",") : [];
               this.blog = data;
@@ -240,7 +297,9 @@
             .then(({ data }) => {
               axios.get("/post/" + this.blog.id)
                 .then(({ data }) => {
-                  data.images = data.images.split(",")
+                  data.images = (data.images && data.images.trim().length > 0)
+                    ? data.images.split(",")
+                    : [];
                   this.blog = data;
                   this.queryLikeList(this.blog.id);
                 })
@@ -265,6 +324,37 @@
         },
         formatTime(b) {
           return b.getFullYear() + "年" + (b.getMonth() + 1) + "月" + b.getDate() + "日 ";
+        },
+        queryComments(id) {
+          axios.get("/post-comments/" + id)
+            .then(({ data }) => this.comments = data)
+            .catch(this.$message.error)
+        },
+        submitComment() {
+          if (!this.commentContent) {
+            this.$message.error('请输入内容')
+            return;
+          }
+          let payload = {
+            postId: this.blog.id,
+            content: this.commentContent,
+            parentId: this.replyParent ? this.replyParent.id : 0,
+            answerId: this.replyTarget ? this.replyTarget.id : 0
+          };
+          axios.post('/post-comments', payload).then(() => {
+            this.$message.success('留言成功')
+            this.commentContent = ''
+            this.cancelReply()
+            this.queryComments(this.blog.id)
+          }).catch(this.$message.error)
+        },
+        startReply(parentComment, targetComment) {
+          this.replyParent = parentComment;
+          this.replyTarget = targetComment;
+        },
+        cancelReply() {
+          this.replyTarget = null;
+          this.replyParent = null;
         },
         formatMinutes(m) {
           if (m < 10) m = "0" + m

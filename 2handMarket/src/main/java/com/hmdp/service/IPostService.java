@@ -16,12 +16,12 @@ public interface IPostService extends IService<Post> {
     /**
      * 查询热门笔记
      */
-    Result queryHotPost(Integer current);
+    Result queryHotPost(Integer current, Double x, Double y, String campus);
 
     /**
      * 根据ID查询笔记详情
      */
-    Result queryPostById(Long id);
+    Result queryPostById(Long id, Double x, Double y);
 
     /**
      * 点赞或取消点赞
@@ -44,8 +44,13 @@ public interface IPostService extends IService<Post> {
     Result queryPostOfFollow(Long max, Integer offset);
 
     /**
-     * 根据关联商品ID查询笔记（用于商品详情页下的动态留言）
+     * 根据关联商品ID查询笔记
      */
     Result queryPostByProductId(Long productId, Integer current);
+
+    /**
+     * 根据帖子分类ID查询帖子（用于首页分类筛选）
+     */
+    Result queryPostByCategoryId(Long categoryId, Integer current, String campus);
 
 }

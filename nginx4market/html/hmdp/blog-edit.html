@@ -41,36 +41,35 @@
       <input v-model="params.title" type="text" placeholder="填写标题更容易上首页哦~">
     </div>
     <div class="blog-content">
-      <textarea v-model="params.content" placeholder="最近打卡了什么地方，有什么新奇体验呢？"></textarea>
+      <textarea v-model="params.content" placeholder="描述一下你的宝贝，比如成色、购买时间、出售原因~"></textarea>
     </div>
+    <!-- 分类选择 -->
     <div class="divider"></div>
-    <div class="blog-shop" @click="showDialog=true">
-      <div class="shop-left">关联商品</div>
-      <div v-if="selectedShop.title">{{selectedShop.title}}</div>
-      <div v-else>去选择&nbsp;<i class="el-icon-arrow-right"></i></div>
-    </div>
-    <div class="mask" v-show="showDialog" @click="showDialog=false"></div>
-
-    <transition name="el-zoom-in-bottom">
-      <div class="shop-dialog" v-show="showDialog">
-        <div class="blog-shop">
-          <div class="shop-left">关联商品</div>
-        </div>
-        <div class="search-bar">
-          <div class="city-select">杭州 <i class="el-icon-arrow-down"></i></div>
-          <div class="search-input">
-            <i class="el-icon-search" @click="queryShops"></i>
-            <input v-model="shopName" type="text" placeholder="搜索商品名称">
-          </div>
-        </div>
-        <div class="shop-list">
-          <div v-for="s in shops" class="shop-item" @click="selectShop(s)">
-            <div class="shop-name">{{s.title}}</div>
-            <div>{{s.campus}}</div>
-          </div>
-        </div>
+    <div class="blog-category">
+      <div class="category-label">帖子类型 <span style="color:#ff6633">*</span></div>
+      <div class="category-options">
+        <div v-for="c in categories" :key="c.id" class="category-chip" :class="{active: selectedCategory === c.id}"
+          @click="selectedCategory = c.id">{{c.name}}</div>
       </div>
-    </transition>
+    </div>
+    <!-- 地点选择 -->
+    <div class="divider"></div>
+    <div class="blog-location">
+      <div class="location-item">
+        <div class="location-label">所属校区 <span style="color:#ff6633">*</span></div>
+        <el-select v-model="params.campus" placeholder="请选择校区" size="small" style="width: 100%"
+          @change="onCampusChange">
+          <el-option v-for="c in campusList" :key="c.name" :label="c.name" :value="c.name"></el-option>
+        </el-select>
+      </div>
+      <div class="location-item" style="margin-top: 10px;">
+        <div class="location-label">详细地点 <span style="color:#ff6633">*</span></div>
+        <el-input v-model="params.location" placeholder="如：中环路、宿舍楼下、饭堂等" size="small"></el-input>
+      </div>
+      <div class="location-item" style="margin-top: 10px; display: flex; font-size: 12px; color: #999;">
+        <span>模拟定位: {{params.x}}, {{params.y}}</span>
+      </div>
+    </div>
   </div>
   <script src="./js/vue.js"></script>
   <script src="./js/axios.min.js"></script>
@@ -85,34 +84,49 @@
       data() {
         return {
           util,
-          fileList: [], // 文件列表
+          fileList: [],
           params: {},
-          showDialog: false, //
-          shops: [], // 商户信息
-          shopName: "", //商户名称
-          selectedShop: {}, // 选中的商户
+          selectedCategory: null,
+          categories: [
+            { id: 1, name: '📱 数码电子' },
+            { id: 2, name: '📚 书籍资料' },
+            { id: 3, name: '🧴 生活用品' },
+            { id: 4, name: '👕 服饰鞋包' },
+            { id: 5, name: '🚲 代步工具' },
+            { id: 6, name: '🔍 求购' },
+          ],
+          campusList: [
+            { name: '中大', x: 113.3934, y: 23.0617 },
+            { name: '华工', x: 113.4077, y: 23.0514 },
+            { name: '华师', x: 113.3970, y: 23.0560 },
+            { name: '广大', x: 113.3719, y: 23.0416 },
+            { name: '广工', x: 113.3912, y: 23.0401 },
+            { name: '广外', x: 113.3971, y: 23.0658 },
+            { name: '广中医', x: 113.3950, y: 23.0500 },
+            { name: '广药', x: 113.4000, y: 23.0450 },
+            { name: '广美', x: 113.3850, y: 23.0420 },
+            { name: '星海', x: 113.3900, y: 23.0550 }
+          ]
         }
       },
       created() {
         this.checkLogin();
-        this.queryShops();
       },
       methods: {
-        queryShops() {
-          axios.get("/product/of/title?title=" + this.shopName)
-            .then(({ data }) => this.shops = data)
-            .catch(this.$message.error)
-        },
-        selectShop(s) {
-          this.selectedShop = s;
-          this.showDialog = false;
-        },
         submitBlog() {
+          if (!this.selectedCategory) {
+            this.$message.error('请选择帖子类型');
+            return;
+          }
+          if (!this.params.campus || !this.params.location) {
+            this.$message.error('请填写发布地点信息');
+            return;
+          }
           let { ...data } = this.params;
-          data.images = this.fileList.join(",");
-          data.shopId = this.selectedShop.id;
-          axios.post("/post", data)
-            .then(resp => location.href = "/info.html")
+          data.images = this.fileList.join(',');
+          data.categoryId = this.selectedCategory;
+          axios.post('/post', data)
+            .then(resp => location.href = '/info.html')
             .catch(this.$message.error)
         },
         openFileDialog() {
@@ -154,6 +168,13 @@
         },
         handleRemove(file) {
           console.log(file);
+        },
+        onCampusChange(val) {
+          let campus = this.campusList.find(c => c.name === val);
+          if (campus) {
+            this.$set(this.params, 'x', campus.x);
+            this.$set(this.params, 'y', campus.y);
+          }
         }
       },
 

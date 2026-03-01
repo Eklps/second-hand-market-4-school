@@ -4,7 +4,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-  <title>黑马点评</title>
+  <title>大学城闲置星球</title>
   <!-- 引入样式 -->
   <link rel="stylesheet" href="./css/element.css">
 
@@ -12,8 +12,97 @@
   <link href="./css/main.css" rel="stylesheet">
 
   <style type="text/css">
+    .search-bar {
+      justify-content: space-between !important;
+    }
+
     .el-input__inner {
       border-radius: 20px;
+    }
+
+    .city-btn {
+      width: 80px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .el-dropdown-link {
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .search-input {
+      flex: 1;
+      margin: 0 10px;
+    }
+
+    .header-icon {
+      width: 80px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 20px;
+      color: #333;
+    }
+
+    /* 帖子校区标签样式 */
+    .blog-location-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 8px;
+      margin-top: -5px;
+    }
+
+    .campus-tag {
+      background: #fdf2f0;
+      color: #ff6633;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 10px;
+      max-width: 60%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .distance-tag {
+      color: #999;
+      font-size: 11px;
+    }
+
+    /* 瀑布流图片悬浮位置标签 */
+    .blog-img-wrapper {
+      position: relative;
+      width: 100%;
+      border-radius: 8px 8px 0 0;
+      overflow: hidden;
+    }
+
+    .blog-img-wrapper img {
+      width: 100%;
+      display: block;
+    }
+
+    .floating-location-tag {
+      position: absolute;
+      left: 8px;
+      bottom: 8px;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      backdrop-filter: blur(2px);
     }
   </style>
 </head>
@@ -21,42 +110,112 @@
 <body>
   <div id="app">
     <div class="search-bar">
-      <div class="city-btn">杭州 <i class="el-icon-arrow-down"></i></div>
+      <div class="city-btn">
+        <el-dropdown trigger="click" @command="handleCampusChange">
+          <span class="el-dropdown-link" style="color: #333; font-weight: bold;">
+            {{currentCampus}} <i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item v-for="c in campusList" :key="c.name" :command="c.name">{{c.name}}</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </div>
       <div class="search-input">
-        <el-input size="mini" placeholder="请输入商户名、地点">
+        <el-input size="mini" placeholder="搜索闲置、帖子">
           <i slot="prefix" class="el-input__icon el-icon-search"></i>
         </el-input>
       </div>
       <div class="header-icon" @click="toPage(4)"><i class="el-icon-user"></i></div>
     </div>
     <div class="type-list">
-      <div class="type-box" v-for="t in types" :key="t.id" @click="toShopList(t.id, getCategoryName(t))">
-        <div class="type-view"><img :src="'/imgs/' + t.icon" alt=""></div>
+      <!-- 全部按钮 -->
+      <div class="type-box" @click="filterByCategory(null)">
+        <div class="type-view" :class="{active: selectedCategoryId === null}">
+          <span style="font-size:26px;">🏠</span>
+        </div>
+        <div class="type-text">全部</div>
+      </div>
+      <div class="type-box" v-for="t in types" :key="t.id" @click="filterByCategory(t.id)">
+        <div class="type-view" :class="{active: selectedCategoryId === t.id}"><img :src="'/imgs/' + t.icon" alt="">
+        </div>
         <div class="type-text">{{getCategoryName(t)}}</div>
+      </div>
+    </div>
+    <!-- 秒杀活动 Banner -->
+    <div style="padding: 0 8px; margin-top: 5px;">
+      <div @click="toCampaign"
+        style="background: linear-gradient(90deg, #ff6633, #ffb366); border-radius: 10px; color: white; display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; cursor: pointer; box-shadow: 0 2px 5px rgba(255,102,51,0.3);">
+        <div>
+          <div style="font-size: 16px; font-weight: bold;">🎁 官方福利盲盒抢购</div>
+          <div style="font-size: 12px; margin-top: 4px; opacity: 0.9;">1元限量抢好物，每周更新！</div>
+        </div>
+        <div
+          style="background: white; color: #ff6633; padding: 5px 10px; border-radius: 15px; font-size: 12px; font-weight: bold;">
+          立即开抢 <i class="el-icon-arrow-right"></i>
+        </div>
       </div>
     </div>
     <div class="blog-list" @scroll="onScroll">
       <div class="waterfall-wrapper">
-        <div class="blog-box" v-for="b in blogs" :key="b.id" @click="toBlogDetail(b)">
-          <div class="blog-img"><img :src="b.img" alt=""></div>
-          <div class="blog-title">{{b.title}}</div>
-          <div class="blog-foot">
-            <div class="blog-user-icon"><img :src="b.icon || '/imgs/icons/default-icon.png'" alt=""></div>
-            <div class="blog-user-name">{{b.nickName || b.name}}</div>
-            <div class="blog-liked" @click.stop="addLike(b)">
-              <svg t="1646634642977" class="icon" viewBox="0 0 1024 1024" version="1.1"
-                xmlns="http://www.w3.org/2000/svg" p-id="2187" width="14" height="14">
-                <path
-                  d="M160 944c0 8.8-7.2 16-16 16h-32c-26.5 0-48-21.5-48-48V528c0-26.5 21.5-48 48-48h32c8.8 0 16 7.2 16 16v448zM96 416c-53 0-96 43-96 96v416c0 53 43 96 96 96h96c17.7 0 32-14.3 32-32V448c0-17.7-14.3-32-32-32H96zM505.6 64c16.2 0 26.4 8.7 31 13.9 4.6 5.2 12.1 16.3 10.3 32.4l-23.5 203.4c-4.9 42.2 8.6 84.6 36.8 116.4 28.3 31.7 68.9 49.9 111.4 49.9h271.2c6.6 0 10.8 3.3 13.2 6.1s5 7.5 4 14l-48 303.4c-6.9 43.6-29.1 83.4-62.7 112C815.8 944.2 773 960 728.9 960h-317c-33.1 0-59.9-26.8-59.9-59.9v-455c0-6.1 1.7-12 5-17.1 69.5-109 106.4-234.2 107-364h41.6z m0-64h-44.9C427.2 0 400 27.2 400 60.7c0 127.1-39.1 251.2-112 355.3v484.1c0 68.4 55.5 123.9 123.9 123.9h317c122.7 0 227.2-89.3 246.3-210.5l47.9-303.4c7.8-49.4-30.4-94.1-80.4-94.1H671.6c-50.9 0-90.5-44.4-84.6-95l23.5-203.4C617.7 55 568.7 0 505.6 0z"
-                  p-id="2188" :fill="b.isLike ? '#ff6633' : '#82848a'"></path>
-              </svg>
-              {{b.liked}}
+        <template v-for="b in blogs">
+          <!-- 无图帖子 -->
+          <!-- 无图帖子 -->
+          <div class="blog-box" v-if="!b.hasImage" :key="'txt-' + b.id" @click="toBlogDetail(b)">
+            <div class="blog-img-wrapper blog-img-placeholder">
+              <span class="placeholder-tag">📝 文字帖</span>
+              <!-- 文字帖内悬浮标签 -->
+              <div class="floating-location-tag" v-if="b.campus">
+                <i class="el-icon-location-outline"></i>
+                <span>{{b.distance ? (b.distance < 1000 ? b.distance + 'm' : (b.distance/1000).toFixed(1) + 'km' )
+                    : '...' }} · {{b.campus}}</span>
+              </div>
+            </div>
+            <div class="blog-title">{{b.title}}</div>
+            <div class="blog-foot">
+              <div class="blog-user-icon"><img :src="b.icon || '/imgs/icons/default-icon.png'" alt=""></div>
+              <div class="blog-user-name">{{b.nickName || b.name}}</div>
+              <div class="blog-liked" @click.stop="addLike(b)">
+                <svg t="1646634642977" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                  xmlns="http://www.w3.org/2000/svg" p-id="2187" width="14" height="14">
+                  <path
+                    d="M160 944c0 8.8-7.2 16-16 16h-32c-26.5 0-48-21.5-48-48V528c0-26.5 21.5-48 48-48h32c8.8 0 16 7.2 16 16v448zM96 416c-53 0-96 43-96 96v416c0 53 43 96 96 96h96c17.7 0 32-14.3 32-32V448c0-17.7-14.3-32-32-32H96zM505.6 64c16.2 0 26.4 8.7 31 13.9 4.6 5.2 12.1 16.3 10.3 32.4l-23.5 203.4c-4.9 42.2 8.6 84.6 36.8 116.4 28.3 31.7 68.9 49.9 111.4 49.9h271.2c6.6 0 10.8 3.3 13.2 6.1s5 7.5 4 14l-48 303.4c-6.9 43.6-29.1 83.4-62.7 112C815.8 944.2 773 960 728.9 960h-317c-33.1 0-59.9-26.8-59.9-59.9v-455c0-6.1 1.7-12 5-17.1 69.5-109 106.4-234.2 107-364h41.6z m0-64h-44.9C427.2 0 400 27.2 400 60.7c0 127.1-39.1 251.2-112 355.3v484.1c0 68.4 55.5 123.9 123.9 123.9h317c122.7 0 227.2-89.3 246.3-210.5l47.9-303.4c7.8-49.4-30.4-94.1-80.4-94.1H671.6c-50.9 0-90.5-44.4-84.6-95l23.5-203.4C617.7 55 568.7 0 505.6 0z"
+                    p-id="2188" :fill="b.isLike ? '#ff6633' : '#82848a'"></path>
+                </svg>
+                {{b.liked}}
+              </div>
             </div>
           </div>
-        </div>
+          <!-- 有图帖子 -->
+          <div class="blog-box" v-else :key="'img-' + b.id" @click="toBlogDetail(b)">
+            <div class="blog-img-wrapper">
+              <img :src="b.img" alt="">
+              <!-- 图片内悬浮标签 -->
+              <div class="floating-location-tag" v-if="b.campus">
+                <i class="el-icon-location-outline"></i>
+                <span>{{b.distance ? (b.distance < 1000 ? b.distance + 'm' : (b.distance/1000).toFixed(1) + 'km' )
+                    : '...' }} · {{b.campus}}</span>
+              </div>
+            </div>
+            <div class="blog-title">{{b.title}}</div>
+            <div class="blog-foot">
+              <div class="blog-user-icon"><img :src="b.icon || '/imgs/icons/default-icon.png'" alt=""></div>
+              <div class="blog-user-name">{{b.nickName || b.name}}</div>
+              <div class="blog-liked" @click.stop="addLike(b)">
+                <svg t="1646634642977" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                  xmlns="http://www.w3.org/2000/svg" p-id="2187" width="14" height="14">
+                  <path
+                    d="M160 944c0 8.8-7.2 16-16 16h-32c-26.5 0-48-21.5-48-48V528c0-26.5 21.5-48 48-48h32c8.8 0 16 7.2 16 16v448zM96 416c-53 0-96 43-96 96v416c0 53 43 96 96 96h96c17.7 0 32-14.3 32-32V448c0-17.7-14.3-32-32-32H96zM505.6 64c16.2 0 26.4 8.7 31 13.9 4.6 5.2 12.1 16.3 10.3 32.4l-23.5 203.4c-4.9 42.2 8.6 84.6 36.8 116.4 28.3 31.7 68.9 49.9 111.4 49.9h271.2c6.6 0 10.8 3.3 13.2 6.1s5 7.5 4 14l-48 303.4c-6.9 43.6-29.1 83.4-62.7 112C815.8 944.2 773 960 728.9 960h-317c-33.1 0-59.9-26.8-59.9-59.9v-455c0-6.1 1.7-12 5-17.1 69.5-109 106.4-234.2 107-364h41.6z m0-64h-44.9C427.2 0 400 27.2 400 60.7c0 127.1-39.1 251.2-112 355.3v484.1c0 68.4 55.5 123.9 123.9 123.9h317c122.7 0 227.2-89.3 246.3-210.5l47.9-303.4c7.8-49.4-30.4-94.1-80.4-94.1H671.6c-50.9 0-90.5-44.4-84.6-95l23.5-203.4C617.7 55 568.7 0 505.6 0z"
+                    p-id="2188" :fill="b.isLike ? '#ff6633' : '#82848a'"></path>
+                </svg>
+                {{b.liked}}
+              </div>
+            </div>
+          </div>
       </div>
+      </template>
     </div>
-    <foot-bar :active-btn="1"></foot-bar>
+  </div>
+  <foot-bar :active-btn="1"></foot-bar>
   </div>
   <script src="./js/vue.js"></script>
   <script src="./js/axios.min.js"></script>
@@ -70,16 +229,33 @@
       el: "#app",
       data: {
         isReachBottom: false,
-        types: [], // 类型列表
-        blogs: [], // 播客列表
-        current: 1,// blog的页码
+        types: [],
+        blogs: [],
+        current: 1,
+        selectedCategoryId: null,
         categoryMap: {
-          1: "数码产品",
-          2: "书籍杂志",
-          3: "日常用品",
-          4: "衣物服饰",
-          5: "通勤载具"
-        }
+          1: '数码产品',
+          2: '书籍杂志',
+          3: '日常用品',
+          4: '衣物服饰',
+          5: '通勤载具',
+          6: '求购'
+        },
+        currentCampus: '全部',
+        campusList: [
+          { name: '全部', x: null, y: null },
+          { name: '中大', x: 113.3934, y: 23.0617 },
+          { name: '华工', x: 113.4077, y: 23.0514 },
+          { name: '华师', x: 113.3970, y: 23.0560 },
+          { name: '广大', x: 113.3719, y: 23.0416 },
+          { name: '广工', x: 113.3912, y: 23.0401 },
+          { name: '广外', x: 113.3971, y: 23.0658 },
+          { name: '广中医', x: 113.3950, y: 23.0500 },
+          { name: '广药', x: 113.4000, y: 23.0450 },
+          { name: '广美', x: 113.3850, y: 23.0420 },
+          { name: '星海', x: 113.3900, y: 23.0550 }
+        ],
+        selectedCampusInfo: null
       },
       created() {
         // 查询类型
@@ -87,6 +263,9 @@
         this.queryHotBlogsScroll();
       },
       methods: {
+        toCampaign() {
+          location.href = '/campaign.html';
+        },
         getCategoryName(t) {
           return this.categoryMap[t.id] || t.title;
         },
@@ -100,9 +279,20 @@
             })
         },
         queryHotBlogsScroll() {
-          axios.get("/post/hot?current=" + this.current)
+          let url = "/post/hot?current=" + this.current;
+          if (this.selectedCampusInfo && this.selectedCampusInfo.x) {
+            url += "&x=" + this.selectedCampusInfo.x + "&y=" + this.selectedCampusInfo.y;
+          }
+          if (this.currentCampus && this.currentCampus !== '全部') {
+            url += "&campus=" + encodeURIComponent(this.currentCampus);
+          }
+          axios.get(url)
             .then(({ data }) => {
-              data.forEach(b => b.img = (b.images && b.images.split(",")[0]) || '');
+              data.forEach(b => {
+                const hasImage = b.images && b.images.trim().length > 0;
+                b.hasImage = hasImage;
+                b.img = hasImage ? b.images.split(",")[0] : null;
+              });
               this.blogs = this.blogs.concat(data);
             })
             .catch(err => {
@@ -144,7 +334,33 @@
           }
         },
         toShopList(id, title) {
-          location.href = "/shop-list.html?type=" + id + "&name=" + title
+          location.href = '/shop-list.html?type=' + id + '&name=' + title
+        },
+        filterByCategory(id) {
+          this.selectedCategoryId = id;
+          this.current = 1;
+          this.blogs = [];
+          if (id) {
+            this.queryPostsByCategory(id);
+          } else {
+            this.queryHotBlogsScroll();
+          }
+        },
+        queryPostsByCategory(categoryId) {
+          let url = '/post/of/category/' + categoryId + '?current=' + this.current;
+          if (this.currentCampus && this.currentCampus !== '全部') {
+            url += "&campus=" + encodeURIComponent(this.currentCampus);
+          }
+          axios.get(url)
+            .then(({ data }) => {
+              if (!data || data.length === 0) return;
+              data.forEach(b => {
+                b.img = (b.images && b.images.split(',')[0]) || '';
+                b.hasImage = !!b.img;
+              });
+              this.blogs = this.blogs.concat(data);
+            })
+            .catch(err => console.log('分类查询失败: ' + err))
         },
         toBlogDetail(b) {
           location.href = "/blog-detail.html?id=" + b.id
@@ -153,9 +369,34 @@
           if (i === 4) {
             location.href = "/info.html"
           }
+        },
+        handleCampusChange(val) {
+          this.currentCampus = val;
+          this.selectedCampusInfo = this.campusList.find(c => c.name === val);
+          if (this.selectedCampusInfo) {
+            localStorage.setItem("currentCampusInfo", JSON.stringify(this.selectedCampusInfo));
+          }
+          this.current = 1;
+          this.blogs = [];
+          if (this.selectedCategoryId) {
+            this.queryPostsByCategory(this.selectedCategoryId);
+          } else {
+            this.queryHotBlogsScroll();
+          }
+          this.$message.success("已切换至：" + val);
         }
       }
     })
+
+    // 监听浏览器缓存恢复事件：当用户从详情页返回时，重新拉取最新数据（如最新点赞数）
+    window.addEventListener('pageshow', function (event) {
+      // event.persisted 为 true 表示页面是从 BFCache（前进/后退缓存）恢复的
+      if (event.persisted) {
+        app.current = 1;
+        app.blogs = [];
+        app.queryHotBlogsScroll();
+      }
+    });
   </script>
 </body>
 

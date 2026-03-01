@@ -2,25 +2,26 @@ package com.hmdp.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.dto.Result;
 import com.hmdp.dto.UserDTO;
 import com.hmdp.entity.Follow;
+import com.hmdp.entity.User;
 import com.hmdp.mapper.FollowMapper;
 import com.hmdp.service.IFollowService;
-import com.hmdp.entity.User;
-
-import javax.annotation.Resource;
-
+import com.hmdp.service.IUserInfoService;
 import com.hmdp.service.IUserService;
+import com.hmdp.utils.SystemConstants;
 import com.hmdp.utils.UserHolder;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
 
 /**
@@ -39,76 +40,122 @@ public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> impleme
     @Resource
     private IUserService userService;
 
+    @Resource
+    private IUserInfoService userInfoService;
+
     @Override
-    public Result follow(Long followUserId, Boolean isFollow){
-        //1.获取登录用户
-        Long userId= UserHolder.getUser().getId();
-        String key="follows:"+userId;
-        //2.判断关注还是取关
-        if(isFollow){
-            //2.1关注，新增数据
-            Follow follow=new Follow();
+    @Transactional
+    public Result follow(Long followUserId, Boolean isFollow) {
+        // 1.获取登录用户
+        UserDTO user = UserHolder.getUser();
+        if (user == null) {
+            return Result.fail("请先登录后操作");
+        }
+        Long userId = user.getId();
+        String key = "follows:" + userId;
+        // 2.判断关注还是取关
+        if (isFollow) {
+            // 2.1关注，新增数据
+            Follow follow = new Follow();
             follow.setUserId(userId);
             follow.setFollowUserId(followUserId);
-            boolean isSuccess=save(follow);
-            if(isSuccess){
-                //把关注用户的id，放入Redis的Set集合 sadd userId followUserId
-                stringRedisTemplate.opsForSet().add(key,followUserId.toString());
+            boolean isSuccess = save(follow);
+            if (isSuccess) {
+                // 把关注用户的id，放入Redis的Set集合 sadd userId followUserId
+                stringRedisTemplate.opsForSet().add(key, followUserId.toString());
+                // 同步更新统计数据：关注者 followee +1, 被关注者 fans +1
+                userInfoService.update().setSql("followee = followee + 1").eq("user_id", userId).update();
+                userInfoService.update().setSql("fans = fans + 1").eq("user_id", followUserId).update();
             }
-        }else{
-            //2.2取关，删除
-            //delete from tb_follow where user_id = ? and follow_user_id =?
-            boolean isSuccess=remove(new QueryWrapper<Follow>()
-                    .eq("user_id",userId)
-                    .eq("follow_user_id",followUserId)
-            );
-            //在这里把关注关系从RedisSet删除
-            stringRedisTemplate.opsForSet().remove(key,followUserId.toString());
+        } else {
+            // 2.2取关，删除
+            boolean isSuccess = remove(new QueryWrapper<Follow>()
+                    .eq("user_id", userId)
+                    .eq("follow_user_id", followUserId));
+            if (isSuccess) {
+                // 在这里把关注关系从RedisSet删除
+                stringRedisTemplate.opsForSet().remove(key, followUserId.toString());
+                // 同步更新统计数据：关注者 followee -1, 被关注者 fans -1
+                userInfoService.update().setSql("followee = followee - 1").eq("user_id", userId).update();
+                userInfoService.update().setSql("fans = fans - 1").eq("user_id", followUserId).update();
+            }
         }
         return Result.ok();
     }
 
     @Override
-    public Result isFollow(Long followUserId){
-        //1.获取登录用户
-        Long userId=UserHolder.getUser().getId();
+    public Result isFollow(Long followUserId) {
+        // 1.获取登录用户
+        Long userId = UserHolder.getUser().getId();
         // 2. 查询是否关注
-        // select count(*) from tb_follow where user_id = ? and follow_user_id = ?
-        Long count=query().eq("user_id",userId)
-                .eq("follow_user_id",followUserId)
+        Long count = query().eq("user_id", userId)
+                .eq("follow_user_id", followUserId)
                 .count();
         // 3. 返回判断
-        return Result.ok(count>0);
+        return Result.ok(count > 0);
     }
 
     @Override
-    public Result followCommons(Long id){
-        //1.获取当前用户
-        Long userId=UserHolder.getUser().getId();
-        String key1="follows:"+userId;
-        //求交集
-        String key2="follows:"+id;
-        Set<String> intersect=stringRedisTemplate.opsForSet().intersect(key1,key2);
+    public Result followCommons(Long id) {
+        // 1.获取当前用户
+        Long userId = UserHolder.getUser().getId();
+        String key1 = "follows:" + userId;
+        // 求交集
+        String key2 = "follows:" + id;
+        Set<String> intersect = stringRedisTemplate.opsForSet().intersect(key1, key2);
 
-        if(intersect==null||intersect.isEmpty()){
-            //无交集
+        if (intersect == null || intersect.isEmpty()) {
+            // 无交集
             return Result.ok(Collections.emptyList());
         }
 
-        //3.有交集，解析id集合
-        //map 方法会遍历流中的每一个元素。
-        // Long::valueOf 是方法引用，等同于 s -> Long.valueOf(s)
-        List<Long> ids=intersect.stream().map(Long::valueOf).collect(Collectors.toList());;
+        // 3.有交集，解析id集合
+        List<Long> ids = intersect.stream().map(Long::valueOf).collect(Collectors.toList());
 
-        //4.查询用户
-        // 4. 查询用户并转化为 DTO 列表
-        List<UserDTO> users = userService.lambdaQuery()
-                .in(User::getId, ids) // 相当于 WHERE id IN (ids...)
-                .list()               // 结束数据库查询，返回 List<User>
-                .stream()             // 开启 Stream 流
-                .map(user -> BeanUtil.copyProperties(user, UserDTO.class)) // 属性映射
-                .collect(Collectors.toList()); // 收集结果
+        // 4.查询用户并转化为 DTO 列表
+        List<UserDTO> users = userService.listByIds(ids).stream()
+                .map(user -> BeanUtil.copyProperties(user, UserDTO.class))
+                .collect(Collectors.toList());
         return Result.ok(users);
     }
 
+    @Override
+    public Result queryFollowers(Integer current) {
+        Long userId = UserHolder.getUser().getId();
+        // 1. 查询粉丝列表（谁关注了我）
+        Page<Follow> page = query().eq("follow_user_id", userId)
+                .page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
+        List<Follow> records = page.getRecords();
+        if (records == null || records.isEmpty()) {
+            return Result.ok(Collections.emptyList(), page.getTotal());
+        }
+        // 2. 获取用户ID
+        List<Long> ids = records.stream().map(Follow::getUserId).collect(Collectors.toList());
+        // 3. 查询用户信息
+        List<UserDTO> users = userService.listByIds(ids).stream()
+                .map(user -> BeanUtil.copyProperties(user, UserDTO.class))
+                .collect(Collectors.toList());
+        // 4. 返回包含总计和列表的数据
+        return Result.ok(users, page.getTotal());
+    }
+
+    @Override
+    public Result queryFollowings(Integer current) {
+        Long userId = UserHolder.getUser().getId();
+        // 1. 查询我关注的人
+        Page<Follow> page = query().eq("user_id", userId)
+                .page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
+        List<Follow> records = page.getRecords();
+        if (records == null || records.isEmpty()) {
+            return Result.ok(Collections.emptyList(), page.getTotal());
+        }
+        // 2. 获取用户ID
+        List<Long> ids = records.stream().map(Follow::getFollowUserId).collect(Collectors.toList());
+        // 3. 查询用户信息
+        List<UserDTO> users = userService.listByIds(ids).stream()
+                .map(user -> BeanUtil.copyProperties(user, UserDTO.class))
+                .collect(Collectors.toList());
+        // 4. 返回包含总计和列表的数据
+        return Result.ok(users, page.getTotal());
+    }
 }

@@ -5,8 +5,16 @@ Vue.component("footBar", {
       <div class="foot-view"><i class="el-icon-s-home"></i></div>
       <div class="foot-text">好物市集</div>
     </div>
+    <div class="foot-box" :class="{active: activeBtn === 2}" @click="toPage(2)">
+      <div class="foot-view"><i class="el-icon-star-on"></i></div>
+      <div class="foot-text">我的关注</div>
+    </div>
     <div class="foot-box" @click="toPage(0)">
       <img class="add-btn" src="/imgs/add.png" alt="">
+    </div>
+    <div class="foot-box" :class="{active: activeBtn === 3}" @click="toPage(3)">
+      <div class="foot-view"><i class="el-icon-chat-dot-round"></i></div>
+      <div class="foot-text">消息</div>
     </div>
     <div class="foot-box" :class="{active: activeBtn === 4}" @click="toPage(4)">
       <div class="foot-view"><i class="el-icon-user"></i></div>
@@ -27,6 +35,10 @@ Vue.component("footBar", {
         location.href = "/info.html"
       } else if (i === 1) {
         location.href = "/"
+      } else if (i === 2) {
+        location.href = "/follow-feed.html"
+      } else if (i === 3) {
+        this.$message.info("消息功能正在开发中...")
       }
     }
   }

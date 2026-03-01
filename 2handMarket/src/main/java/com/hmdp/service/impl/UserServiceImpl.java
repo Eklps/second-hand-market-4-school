@@ -184,4 +184,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
         return Result.ok(count);
     }
+
+    @Override
+    public Result logout() {
+        // 1. 获取 token
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+                .getRequest();
+        String token = request.getHeader("authorization");
+        if (StrUtil.isBlank(token)) {
+            return Result.ok();
+        }
+        // 2. 删除 redis 中的 token
+        stringRedisTemplate.delete(LOGIN_USER_KEY + token);
+        // 3. 清理 UserHolder
+        UserHolder.removeUser();
+        return Result.ok();
+    }
 }

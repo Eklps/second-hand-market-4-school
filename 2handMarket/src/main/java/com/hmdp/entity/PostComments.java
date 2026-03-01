@@ -1,6 +1,8 @@
 package com.hmdp.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -9,6 +11,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -76,5 +79,19 @@ public class PostComments implements Serializable {
      * 更新时间
      */
     private LocalDateTime updateTime;
+
+    @TableField(exist = false)
+    private String nickName;
+
+    @TableField(exist = false)
+    private String icon;
+
+    /** 被回复者昵称（仅回复时有值） */
+    @TableField(exist = false)
+    private String replyNickName;
+
+    /** 子回复列表（一级评论下的回复） */
+    @TableField(exist = false)
+    private List<PostComments> children;
 
 }

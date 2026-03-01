@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hmdp.dto.Result;
 import com.hmdp.dto.UserDTO;
 import com.hmdp.entity.Post;
-import com.hmdp.entity.User;
 import com.hmdp.service.IPostService;
 import com.hmdp.service.IUserService;
 import com.hmdp.utils.SystemConstants;
@@ -35,8 +34,11 @@ public class PostController {
      * 根据id查询博客
      */
     @GetMapping("/{id}")
-    public Result queryPostById(@PathVariable("id") Long id) {
-        return postService.queryPostById(id);
+    public Result queryPostById(
+            @PathVariable("id") Long id,
+            @RequestParam(value = "x", required = false) Double x,
+            @RequestParam(value = "y", required = false) Double y) {
+        return postService.queryPostById(id, x, y);
     }
 
     @PostMapping
@@ -68,8 +70,12 @@ public class PostController {
     }
 
     @GetMapping("/hot")
-    public Result queryHotPost(@RequestParam(value = "current", defaultValue = "1") Integer current) {
-        return postService.queryHotPost(current);
+    public Result queryHotPost(
+            @RequestParam(value = "current", defaultValue = "1") Integer current,
+            @RequestParam(value = "x", required = false) Double x,
+            @RequestParam(value = "y", required = false) Double y,
+            @RequestParam(value = "campus", required = false) String campus) {
+        return postService.queryHotPost(current, x, y, campus);
     }
 
     @GetMapping("/likes/{id}")
@@ -89,6 +95,14 @@ public class PostController {
             @PathVariable("id") Long id,
             @RequestParam(value = "current", defaultValue = "1") Integer current) {
         return postService.queryPostByProductId(id, current);
+    }
+
+    @GetMapping("/of/category/{id}")
+    public Result queryPostByCategoryId(
+            @PathVariable("id") Long id,
+            @RequestParam(value = "current", defaultValue = "1") Integer current,
+            @RequestParam(value = "campus", required = false) String campus) {
+        return postService.queryPostByCategoryId(id, current, campus);
     }
 
 }

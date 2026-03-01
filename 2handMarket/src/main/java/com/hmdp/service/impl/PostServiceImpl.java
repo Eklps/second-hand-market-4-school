@@ -2,6 +2,9 @@ package com.hmdp.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.BooleanUtil;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.entity.Follow;
@@ -26,6 +29,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.concurrent.TimeUnit;
+import com.hmdp.utils.RedisConstants;
+import org.springframework.data.geo.Point;
 
 /**
  * <p>
@@ -58,16 +64,24 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
             return Result.fail("新增笔记失败");
         }
 
-        // 3.查询笔记作者的所有粉丝
+        // 3. 将地理位置信息同步到 Redis GEO (仅当坐标存在时)
+        if (post.getX() != null && post.getY() != null) {
+            stringRedisTemplate.opsForGeo().add(
+                    RedisConstants.POST_GEO_KEY,
+                    new Point(post.getX(), post.getY()),
+                    post.getId().toString());
+        }
+
+        // 4.查询笔记作者的所有粉丝
         // select * from tb_follow where follow_user_id = ?
         List<Follow> follows = followService.query()
                 .eq("follow_user_id", user.getId())
                 .list();
-        // 4.推送笔记id给所有粉丝
+        // 5.推送笔记id给所有粉丝
         for (Follow follow : follows) {
-            // 4.1获取粉丝id
+            // 5.1获取粉丝id
             Long userId = follow.getUserId();
-            // 4.2推送到粉丝的收件箱(RedisSortedSet)
+            // 5.2推送到粉丝的收件箱(RedisSortedSet)
             String key = "feed:" + userId;
             stringRedisTemplate.opsForZSet()
                     .add(key, post.getId().toString(), System.currentTimeMillis());
@@ -78,28 +92,45 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     }
 
     @Override
-    public Result queryHotPost(Integer current) {
-        // 根据点赞数降序查询
-        Page<Post> page = query().orderByDesc("liked")
+    public Result queryHotPost(Integer current, Double x, Double y, String campus) {
+        // 1.根据点赞数降序查询
+        com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper<Post> queryWrapper = query();
+        // 如果传入了校区且不是“全部”，则增加过滤条件
+        if (StrUtil.isNotBlank(campus) && !"全部".equals(campus)) {
+            queryWrapper.eq("campus", campus);
+        }
+
+        Page<Post> page = queryWrapper.orderByDesc("liked")
                 .page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
-        // 获取当前页数据
-        /**
-         * page.getRecords() 的作用是 从分页查询的结果对象中
-         * 提取出真正的业务数据列表（即当前页的博客列表）。
-         *
-         * 此时 records 是一个 List<Post>，里面的每个 Post 对象只包含数据库 tb_post
-         * 表里的原始信息（如标题、内容、点赞数、发帖人ID）
-         * 但还缺少一些动态信息，就是下面lambda函数的icon,name&isLike
-         */
         List<Post> records = page.getRecords();
 
-        // 遍历，为每一个Post填充用户信息和点赞状态
-        // 这里的两个方法分别填充了post类中缺失的icon,name以及isLike
+        if (records == null || records.isEmpty()) {
+            return Result.ok();
+        }
+
+        // 2.遍历，填充基础信息
         records.forEach(post -> {
             this.queryPostUser(post);
             this.isPostLiked(post);
+            // 3. 如果经纬度不为空，计算距离显示
+            if (x != null && y != null && post.getX() != null && post.getY() != null) {
+                double distance = calculateDistance(x, y, post.getX(), post.getY());
+                post.setDistance(distance);
+            }
         });
         return Result.ok(records);
+    }
+
+    private double calculateDistance(double x1, double y1, double x2, double y2) {
+        // Haversine formula (简单实现，返回米)
+        double R = 6371000; // 地球半径
+        double dLat = Math.toRadians(y2 - y1);
+        double dLon = Math.toRadians(x2 - x1);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(Math.toRadians(y1)) * Math.cos(Math.toRadians(y2)) *
+                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return Math.round(R * c); // 返回整数距离
     }
 
     @Override
@@ -176,30 +207,75 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     }
 
     @Override
-    public Result queryPostById(Long id) {
-        // 1.查询博客
-        Post post = getById(id);
-        if (post == null) {
-            return Result.fail("笔记不存在");
+    public Result queryPostById(Long id, Double x, Double y) {
+        String key = RedisConstants.CACHE_POST_KEY + id;
+
+        // 1. 从 redis 尝试命中缓存
+        String postJson = stringRedisTemplate.opsForValue().get(key);
+        Post post = null;
+
+        // 2. 处理缓存命中
+        if (StrUtil.isNotBlank(postJson)) {
+            post = JSONUtil.toBean(postJson, Post.class);
+        } else if (postJson != null) {
+            // 【防穿透】
+            return Result.fail("您访问的帖子好像被火星人劫持了！");
+        } else {
+            // 3. 缓存未命中，重建缓存 (防击穿)
+            String lockKey = RedisConstants.LOCK_POST_KEY + id;
+            try {
+                boolean isLock = tryLock(lockKey);
+                if (!isLock) {
+                    Thread.sleep(50);
+                    return queryPostById(id, x, y);
+                }
+                post = getById(id);
+                if (post == null) {
+                    stringRedisTemplate.opsForValue().set(key, "", RedisConstants.CACHE_NULL_TTL, TimeUnit.MINUTES);
+                    return Result.fail("您访问的帖子好像被火星人劫持了！");
+                }
+                long ttl = RedisConstants.CACHE_POST_TTL + RandomUtil.randomLong(0, 5);
+                stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(post), ttl, TimeUnit.MINUTES);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } finally {
+                unlock(lockKey);
+            }
         }
-        // 2.查询post相关的用户
+
+        // 4. 填充作者、点赞、浏览量
         queryPostUser(post);
-        // 3.查询是否点赞
         isPostLiked(post);
-        // 4.记录浏览量（HyperLogLog 去重统计）
-        String uvKey = "post:uv:" + id;
+        recordAndSetUv(post);
+
+        // 5. 【新增】计算传入坐标与帖子的距离
+        if (x != null && y != null && post.getX() != null && post.getY() != null) {
+            double distance = calculateDistance(x, y, post.getX(), post.getY());
+            post.setDistance(distance);
+        }
+
+        return Result.ok(post);
+    }
+
+    private void recordAndSetUv(Post post) {
+        String uvKey = "post:uv:" + post.getId();
         UserDTO user = UserHolder.getUser();
         if (user != null) {
-            // 登录用户：用 userId 去重
             stringRedisTemplate.opsForHyperLogLog().add(uvKey, user.getId().toString());
         } else {
-            // 未登录用户：用请求的 sessionId 或 IP 去重（这里简单处理，用时间戳+随机数）
             stringRedisTemplate.opsForHyperLogLog().add(uvKey, "anonymous_" + System.nanoTime());
         }
-        // 5.查询浏览量
         Long viewCount = stringRedisTemplate.opsForHyperLogLog().size(uvKey);
         post.setViewCount(viewCount);
-        return Result.ok(post);
+    }
+
+    private boolean tryLock(String key) {
+        Boolean flag = stringRedisTemplate.opsForValue().setIfAbsent(key, "1", 10, TimeUnit.SECONDS);
+        return BooleanUtil.isTrue(flag);
+    }
+
+    private void unlock(String key) {
+        stringRedisTemplate.delete(key);
     }
 
     @Override
@@ -279,6 +355,31 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
             }
         });
 
+        return Result.ok(records);
+    }
+
+    @Override
+    public Result queryPostByCategoryId(Long categoryId, Integer current, String campus) {
+        com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper<Post> queryWrapper = query()
+                .eq("category_id", categoryId);
+
+        // 如果校区不为空且不是“全部”，则增加校区过滤
+        if (StrUtil.isNotBlank(campus) && !"全部".equals(campus)) {
+            queryWrapper.eq("campus", campus);
+        }
+
+        Page<Post> page = queryWrapper.orderByDesc("liked")
+                .page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
+        List<Post> records = page.getRecords();
+        if (records == null || records.isEmpty()) {
+            return Result.ok(Collections.emptyList());
+        }
+        records.forEach(post -> {
+            this.queryPostUser(post);
+            this.isPostLiked(post);
+            if (post.getImages() == null)
+                post.setImages("");
+        });
         return Result.ok(records);
     }
 

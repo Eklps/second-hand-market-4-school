@@ -4,7 +4,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-  <title>黑马点评</title>
+  <title>大学城闲置星球</title>
   <!-- 引入样式 -->
   <link rel="stylesheet" href="./css/element.css">
 
@@ -35,16 +35,20 @@
       <div class="shop-address">
         <div><i class="el-icon-map-location"></i></div>
         <span>{{shop.location}}</span>
-        <div style="width: 10px; flex-grow: 2; text-align: center; color: #e1e2e3">|</div>
-        <!-- 添加状态标签 -->
-        <span v-if="shop.status !== undefined" class="status-badge"
-          :style="shop.status === 0 ? 'color: #52c41a; background: #f6ffed; border: 1px solid #b7eb8f; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 5px;' : (shop.status === 1 ? 'color: #fa8c16; background: #fff7e6; border: 1px solid #ffd591; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 5px;' : 'color: #8c8c8c; background: #f5f5f5; border: 1px solid #d9d9d9; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 5px;')">
-          {{ shop.status === 0 ? '待售' : (shop.status === 1 ? '已预订' : '已售出') }}
-        </span>
-        <div style="margin: 0 5px"><img
-            src="https://p0.meituan.net/travelcube/bf684aa196c870810655e45b1e52ce843484.png@24w_16h_40q" alt=""></div>
-        <div><img src="https://p0.meituan.net/travelcube/9277ace32123e0c9f59dedf4407892221566.png@24w_24h_40q" alt="">
-        </div>
+        <span v-if="distance" style="margin-left: 10px; color: #999; font-size: 12px;">距您 {{distance < 1000 ? distance
+            + 'm' : (distance/1000).toFixed(1) + 'km' }}</span>
+            <div style="width: 10px; flex-grow: 2; text-align: center; color: #e1e2e3">|</div>
+            <!-- 添加状态标签 -->
+            <span v-if="shop.status !== undefined" class="status-badge"
+              :style="shop.status === 0 ? 'color: #52c41a; background: #f6ffed; border: 1px solid #b7eb8f; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 5px;' : (shop.status === 1 ? 'color: #fa8c16; background: #fff7e6; border: 1px solid #ffd591; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 5px;' : 'color: #8c8c8c; background: #f5f5f5; border: 1px solid #d9d9d9; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-right: 5px;')">
+              {{ shop.status === 0 ? '待售' : (shop.status === 1 ? '已预订' : '已售出') }}
+            </span>
+            <div style="margin: 0 5px"><img
+                src="https://p0.meituan.net/travelcube/bf684aa196c870810655e45b1e52ce843484.png@24w_16h_40q" alt="">
+            </div>
+            <div><img src="https://p0.meituan.net/travelcube/9277ace32123e0c9f59dedf4407892221566.png@24w_24h_40q"
+                alt="">
+            </div>
       </div>
 
       <!-- 价格和划线价展示 -->
@@ -95,15 +99,13 @@
     <div class="shop-divider"></div>
     <div class="shop-comments" v-if="comments && comments.length > 0">
       <div class="comments-head">
-        <div>相关话题留言 <span>（{{comments.length}}）</span></div>
+        <div>宝贝留言 <span>（{{comments.length}}）</span></div>
         <div><i class="el-icon-arrow-right"></i></div>
       </div>
       <div class="comment-list">
         <div class="comment-box" v-for="c in comments" :key="c.id">
           <div class="comment-icon">
-            <img
-              :src="c.icon || '/imgs/icons/default-icon.png'"
-              alt="">
+            <img :src="c.icon || '/imgs/icons/default-icon.png'" alt="">
           </div>
           <div class="comment-info">
             <div class="comment-user">{{c.name}}</div>
@@ -143,11 +145,13 @@
         util,
         shop: {},
         vouchers: [],
-        comments: []
+        comments: [],
+        distance: ''
       },
       created() {
         // 获取参数
         let shopId = util.getUrlParam("id");
+        this.distance = util.getUrlParam("distance");
         // 查询酒店信息
         this.queryShopById(shopId);
         // 查询优惠券信息

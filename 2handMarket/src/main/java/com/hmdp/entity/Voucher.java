@@ -36,6 +36,7 @@ public class Voucher implements Serializable {
     /**
      * 商铺id
      */
+    @TableField("shop_id")
     private Long productId;
 
     /**
@@ -95,11 +96,15 @@ public class Voucher implements Serializable {
      */
     private LocalDateTime createTime;
 
+    /**
+     * 当前登录用户是否已抢到
+     */
+    @TableField(exist = false)
+    private Boolean isClaimed;
 
     /**
      * 更新时间
      */
     private LocalDateTime updateTime;
-
 
 }
