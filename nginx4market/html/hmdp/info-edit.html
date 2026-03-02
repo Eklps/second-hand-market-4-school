@@ -11,115 +11,304 @@
   <link href="./css/info.css" rel="stylesheet">
 
   <style type="text/css">
-    .info-item {
-      cursor: pointer;
+    /* 基础样式复用与增强 */
+    body {
+      background-color: #f7f8fa;
+      margin: 0;
     }
 
-    .info-item:active {
-      background-color: #f5f5f5;
+    .header-edit {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: white;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .gender-radio-group {
+    .header-edit .back-btn {
+      font-size: 20px;
+      color: #333;
+      width: 40px;
+    }
+
+    .header-edit .title-main {
+      font-size: 17px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .header-edit .save-placeholder {
+      width: 40px;
+    }
+
+    .edit-scroll-view {
+      padding-bottom: 80px;
+    }
+
+    /* 头像修改区 */
+    .avatar-edit-section {
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      padding: 10px 0;
+      align-items: center;
+      padding: 30px 0;
+      background: white;
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      width: 90px;
+      height: 90px;
+    }
+
+    .avatar-wrapper img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #fff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .upload-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .avatar-wrapper:active .upload-overlay {
+      opacity: 1;
+    }
+
+    .upload-overlay i {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+
+    .upload-overlay span {
+      font-size: 11px;
+    }
+
+    /* 卡片组样式 */
+    .card-group {
+      margin-top: 15px;
+    }
+
+    .group-title {
+      padding: 0 20px 8px;
+      font-size: 13px;
+      color: #999;
+    }
+
+    .edit-card {
+      background: white;
+      margin: 0 12px;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .edit-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 18px;
+      transition: background 0.2s;
+    }
+
+    .edit-item:active {
+      background: #f9f9f9;
+    }
+
+    .item-label {
+      font-size: 15px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .item-value {
+      display: flex;
+      align-items: center;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .item-value i {
+      margin-left: 6px;
+      color: #ccc;
+      font-size: 16px;
+    }
+
+    .item-divider {
+      height: 1px;
+      background: #f5f5f5;
+      margin-left: 18px;
+    }
+
+    /* 个人介绍长文本项 */
+    .edit-item-long {
+      padding: 16px 18px;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .edit-item-long:active {
+      background: #f9f9f9;
+    }
+
+    .edit-item-long .item-text {
+      margin-top: 8px;
+      font-size: 13px;
+      color: #888;
+      line-height: 1.6;
+      padding-right: 20px;
+    }
+
+    .edit-item-long i {
+      position: absolute;
+      right: 18px;
+      top: 50px;
+      color: #ccc;
+    }
+
+    .highlight-txt {
+      color: #ff6633;
+      font-weight: 500;
+    }
+
+    .vip-link {
+      color: #ff9900;
+      font-weight: 600;
+    }
+
+    /* 性别选择弹出框覆盖 */
+    .gender-radio-group {
+      padding: 20px 10px;
     }
 
     .gender-radio-group label {
       display: flex;
       align-items: center;
-      font-size: 16px;
-      cursor: pointer;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: #f8f9fa;
+      margin-bottom: 10px;
+      transition: all 0.2s;
     }
 
-    .gender-radio-group input[type="radio"] {
-      margin-right: 8px;
-      width: 18px;
-      height: 18px;
+    .gender-radio-group label:has(input:checked) {
+      background: #fff0eb;
+      color: #ff6633;
     }
   </style>
 </head>
 
 <body>
   <div id="app">
-    <div class="header">
-      <div class="header-back-btn" @click="goBack"><i class="el-icon-arrow-left"></i></div>
-      <div class="header-title">资料编辑&nbsp;&nbsp;&nbsp;</div>
+    <!-- 顶部导航 -->
+    <div class="header-edit">
+      <div class="back-btn" @click="goBack"><i class="el-icon-arrow-left"></i></div>
+      <div class="title-main">编辑个人资料</div>
+      <div class="save-placeholder"></div>
     </div>
-    <div class="edit-container">
-      <div class="info-box">
-        <!-- 头像修改：通过隐藏的 file input 实现 -->
-        <div class="info-item" @click="openFileInput">
-          <div class="info-label">头像</div>
-          <div class="info-btn">
-            <img width="35" height="35" style="object-fit: cover; border-radius: 50%;"
-              :src="user.icon || '/imgs/icons/default-icon.png'" alt="">
-            <div><i class="el-icon-arrow-right"></i></div>
-          </div>
-          <input type="file" ref="fileInput" @change="uploadIcon" accept="image/*" style="display: none;">
-        </div>
-        <div class="divider"></div>
-        <div class="info-item" @click="editNickName">
-          <div class="info-label">昵称</div>
-          <div class="info-btn">
-            <div>{{user.nickName}}</div>
-            <div>
-              <i class="el-icon-arrow-right"></i>
-            </div>
+
+    <div class="edit-scroll-view">
+      <!-- 头像大卡片 -->
+      <div class="avatar-edit-section">
+        <div class="avatar-wrapper" @click="openFileInput">
+          <img :src="user.icon || '/imgs/icons/default-icon.png'" alt="">
+          <div class="upload-overlay">
+            <i class="el-icon-camera"></i>
+            <span>更换头像</span>
           </div>
         </div>
-        <div class="divider"></div>
-        <div class="info-item" @click="editIntroduce">
-          <div class="info-label">个人介绍</div>
-          <div class="info-btn">
-            <div style="overflow: hidden; width: 150px;text-align: right">{{info.introduce || '介绍一下自己'}}</div>
-            <div>
-              <i class="el-icon-arrow-right"></i>
-            </div>
-          </div>
-        </div>
+        <input type="file" ref="fileInput" @change="uploadIcon" accept="image/*" style="display: none;">
       </div>
-      <div class="info-box">
-        <div class="info-item" @click="editGender">
-          <div class="info-label">性别</div>
-          <div class="info-btn">
-            <div>{{genderText}}</div>
-            <div><i class="el-icon-arrow-right"></i></div>
+
+      <!-- 核心资料组 -->
+      <div class="card-group">
+        <div class="group-title">核心资料</div>
+        <div class="edit-card">
+          <div class="edit-item" @click="editNickName">
+            <div class="item-label">昵称</div>
+            <div class="item-value">
+              <span>{{user.nickName}}</span>
+              <i class="el-icon-arrow-right"></i>
+            </div>
           </div>
-        </div>
-        <div class="divider"></div>
-        <div class="info-item" @click="editCity">
-          <div class="info-label">城市</div>
-          <div class="info-btn">
-            <div>{{info.city || '选择'}}</div>
-            <div><i class="el-icon-arrow-right"></i></div>
+          <div class="item-divider"></div>
+          <div class="edit-item" @click="editGender">
+            <div class="item-label">性别</div>
+            <div class="item-value">
+              <span>{{genderText}}</span>
+              <i class="el-icon-arrow-right"></i>
+            </div>
           </div>
-        </div>
-        <div class="divider"></div>
-        <div class="info-item" @click="editBirthday">
-          <div class="info-label">生日</div>
-          <div class="info-btn">
-            <div>{{info.birthday || '添加'}}</div>
-            <div><i class="el-icon-arrow-right"></i></div>
+          <div class="item-divider"></div>
+          <div class="edit-item" @click="editBirthday">
+            <div class="item-label">生日</div>
+            <div class="item-value">
+              <span>{{info.birthday || '未设置'}}</span>
+              <i class="el-icon-arrow-right"></i>
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="info-box">
-        <div class="info-item">
-          <div class="info-label">我的积分</div>
-          <div class="info-btn">
-            <div>查看积分</div>
-            <div><i class="el-icon-arrow-right"></i></div>
+      <!-- 个人背景组 -->
+      <div class="card-group">
+        <div class="group-title">个人背景</div>
+        <div class="edit-card">
+          <div class="edit-item" @click="editCity">
+            <div class="item-label">居住城市</div>
+            <div class="item-value">
+              <span>{{info.city || '点击添加'}}</span>
+              <i class="el-icon-arrow-right"></i>
+            </div>
+          </div>
+          <div class="item-divider"></div>
+          <div class="edit-item-long" @click="editIntroduce">
+            <div class="item-label">个人介绍</div>
+            <div class="item-text">
+              {{info.introduce || '介绍一下自己，让大家更懂你...'}}
+            </div>
+            <i class="el-icon-edit-outline"></i>
           </div>
         </div>
-        <div class="divider"></div>
-        <div class="info-item">
-          <div class="info-label">会员等级</div>
-          <div class="info-btn">
-            <div><a href="javascript:void(0)">成为VIP尊享特权</a></div>
-            <div><i class="el-icon-arrow-right"></i></div>
+      </div>
+
+      <!-- 账号权益 -->
+      <div class="card-group">
+        <div class="group-title">账号权益</div>
+        <div class="edit-card">
+          <div class="edit-item">
+            <div class="item-label">我的积分</div>
+            <div class="item-value">
+              <span class="highlight-txt">查看详情</span>
+              <i class="el-icon-arrow-right"></i>
+            </div>
+          </div>
+          <div class="item-divider"></div>
+          <div class="edit-item">
+            <div class="item-label">等级中心</div>
+            <div class="item-value">
+              <span class="vip-link">成为VIP尊享特权</span>
+              <i class="el-icon-medal"></i>
+            </div>
           </div>
         </div>
       </div>
@@ -136,9 +325,11 @@
 
     const app = new Vue({
       el: "#app",
-      data: {
-        user: "",
-        info: {},
+      data() {
+        return {
+          user: "",
+          info: {},
+        }
       },
       computed: {
         genderText() {
@@ -172,12 +363,11 @@
               if (this.user) {
                 this.info = JSON.parse(sessionStorage.getItem("userInfo")) || {};
               } else {
-                this.$message.error(err);
+                this.$message.error(err.message || '登录已过期');
                 setTimeout(() => location.href = "login.html", 1000);
               }
             })
         },
-        // 刷新用户数据（编辑成功后调用）
         refreshUser() {
           axios.get("/user/me")
             .then(({ data }) => {
@@ -190,7 +380,9 @@
                 sessionStorage.setItem("userInfo", JSON.stringify(data));
               }
             })
-            .catch(() => { })
+            .catch(err => {
+              console.error('刷新资料失败:', err);
+            })
         },
         // ========== 头像上传方法 ==========
         openFileInput() {
@@ -224,7 +416,7 @@
             this.refreshUser(); // 刷新数据
           }).catch(err => {
             loading.close();
-            this.$message.error(err || '头像修改失败');
+            this.$message.error(err.message || '头像修改失败');
           }).finally(() => {
             // 清空 input，以便下次选择同一张图片时仍能触发 change 事件
             e.target.value = '';
@@ -246,7 +438,7 @@
             this.refreshUser();
           }).catch((err) => {
             if (err !== 'cancel') {
-              this.$message.error(err || '修改失败');
+              this.$message.error(err.message || '修改失败');
             }
           });
         },
@@ -269,7 +461,7 @@
             this.refreshUser();
           }).catch((err) => {
             if (err !== 'cancel') {
-              this.$message.error(err || '修改失败');
+              this.$message.error(err.message || '修改失败');
             }
           });
         },
@@ -317,7 +509,7 @@
                     done();
                   })
                   .catch((err) => {
-                    this.$message.error(err || '修改失败');
+                    this.$message.error(err.message || '修改失败');
                     done();
                   });
               } else {
@@ -341,7 +533,7 @@
             this.refreshUser();
           }).catch((err) => {
             if (err !== 'cancel') {
-              this.$message.error(err || '修改失败');
+              this.$message.error(err.message || '修改失败');
             }
           });
         },
@@ -396,7 +588,7 @@
                     done();
                   })
                   .catch((err) => {
-                    this.$message.error(err || '修改失败');
+                    this.$message.error(err.message || '修改失败');
                     done();
                   });
               } else {

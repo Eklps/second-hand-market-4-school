@@ -163,6 +163,9 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
             }
         }
 
+        // 5. 清理帖子详情缓存，确保下次查询时能看到最新的点赞数
+        stringRedisTemplate.delete(RedisConstants.CACHE_POST_KEY + id);
+
         return Result.ok();
     }
 
@@ -387,7 +390,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     private void queryPostUser(Post post) {
         Long userId = post.getUserId();
         User user = userService.getById(userId);
-        post.setName(user.getNickName());
+        post.setNickName(user.getNickName());
         post.setIcon(user.getIcon());
     }
 

@@ -70,12 +70,16 @@
           <img :src="blog.icon || '/imgs/icons/default-icon.png'" alt="">
         </div>
         <div class="basic-info">
-          <div class="name">{{blog.name}}</div>
+          <div class="name">{{blog.nickName}}</div>
           <span class="time">{{formatTime(new Date(blog.createTime))}}</span>
         </div>
-        <div style="width: 20%">
+        <div style="width: 25%; display: flex; flex-direction: column; gap: 5px;">
           <div class="logout-btn" @click="follow" v-show="!user || user.id !== blog.userId ">
             {{followed ? '取消关注' : '关注'}}
+          </div>
+          <div class="logout-btn" style="background-color: #f7f8fa; color: #ff6633; border: 1px solid #ff6633;"
+            @click="toChat" v-show="!user || user.id !== blog.userId ">
+            私聊
           </div>
         </div>
 
@@ -256,6 +260,13 @@
             location.href = "/other-info.html?id=" + this.blog.userId
           }
         },
+        toChat() {
+          if (!this.user || !this.user.id) {
+            this.$message.error("请先登录再进行私聊哦");
+            return;
+          }
+          location.href = `/chat.html?toId=${this.blog.userId}&name=${encodeURIComponent(this.blog.nickName)}&icon=${this.blog.icon}`;
+        },
         queryBlogById(id) {
           // 获取当前选择的校区坐标进行计算
           const campusStr = localStorage.getItem("currentCampusInfo");
@@ -370,7 +381,9 @@
                 this.isFollowed();
               }
             })
-            .catch(console.log)
+            .catch(err => {
+              this.$message.error(err.message || '获取用户信息失败')
+            })
         },
         // 获取父容器宽度，并且更新所有的子节点宽度，因为我们默认所有子节点的宽高等于父节点的宽高
         updateItemWidth() {

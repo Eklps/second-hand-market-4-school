@@ -36,33 +36,69 @@
 
 <body>
   <div id="app">
-    <div class="header">
-      <div class="header-back-btn" @click="goBack"><i class="el-icon-arrow-left"></i></div>
-      <div class="header-title">&nbsp;&nbsp;&nbsp;</div>
-    </div>
-    <div class="basic">
-      <div class="basic-icon">
-        <img :src="user.icon || '/imgs/icons/default-icon.png'" alt="">
-      </div>
-      <div class="basic-info">
-        <div class="name">{{user.nickName}}</div>
-        <span>{{info.city || '未知'}}</span>
-      </div>
-      <div class="logout-btn" @click="follow" style="text-align: center">
-        {{followed ? "取消关注" : "关注"}}
+    <!-- 顶部星际背景区 -->
+    <div class="stellar-hero">
+      <div class="header-transparent">
+        <div class="back-btn" @click="goBack"><i class="el-icon-arrow-left"></i></div>
+        <div class="title-main">闲置星球 · 探索</div>
       </div>
     </div>
-    <div class="introduce">
-      <span v-if="info.introduce"></span>
-      <span v-else>这个人很懒，什么都没有留下</span>
+
+    <!-- 悬浮个人中心卡片 -->
+    <div class="user-card-wrap">
+      <div class="user-main-card">
+        <div class="user-top">
+          <div class="avatar-box">
+            <img :src="user.icon || '/imgs/icons/default-icon.png'" alt="">
+          </div>
+          <div class="user-detail">
+            <div class="nick-row">
+              <span class="nick-name">{{user.nickName}}</span>
+              <span class="city-tag"><i class="el-icon-location"></i> {{info.city || '未知'}}</span>
+            </div>
+            <div class="bio-row">
+              <span v-if="info.introduce">{{info.introduce}}</span>
+              <span v-else class="bio-placeholder">这个星球的居民很神秘，什么都没写...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 功能按钮区 -->
+        <div class="action-row-stellar">
+          <button class="stellar-btn" :class="{followed: followed}" @click="follow">
+            {{followed ? '已关注' : '+ 关注'}}
+          </button>
+          <button class="stellar-btn-outline" @click="toChat">
+            私聊
+          </button>
+        </div>
+
+        <!-- 数字看板 -->
+        <div class="stats-board">
+          <div class="stat-item" @click="activeName='1'">
+            <div class="stat-num">{{blogs.length}}</div>
+            <div class="stat-label">笔记</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item" @click="activeName='2'">
+            <div class="stat-num">{{commonFollows.length}}</div>
+            <div class="stat-label">共同关注</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <div class="stat-num">--</div>
+            <div class="stat-label">好评率</div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="content">
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="笔记" name="1">
           <div v-for="b in blogs" :key="b.id" class="blog-item">
-            <div class="blog-img"><img :src="b.images.split(',')[0]" alt=""></div>
+            <div class="blog-img" @click="toBlogDetail(b)"><img :src="b.images.split(',')[0]" alt=""></div>
             <div class="blog-info">
-              <div class="blog-title" v-html="b.title"></div>
+              <div class="blog-title" v-html="b.title" @click="toBlogDetail(b)"></div>
               <div class="blog-liked"><img src="/imgs/thumbup.png" alt=""> {{b.liked}}</div>
               <div class="blog-comments"><i class="el-icon-chat-dot-round"></i> {{b.comments}}</div>
             </div>
@@ -95,15 +131,17 @@
   <script>
     const app = new Vue({
       el: "#app",
-      data: {
-        util,
-        user: "",
-        loginUser: {},
-        activeName: "1",
-        info: {},
-        blogs: [],
-        followed: false, // 是否关注了
-        commonFollows: [], // 共同关注
+      data() {
+        return {
+          util,
+          user: "",
+          loginUser: {},
+          activeName: "1",
+          info: {},
+          blogs: [],
+          followed: false, // 是否关注了
+          commonFollows: [], // 共同关注
+        }
       },
       created() {
         this.queryUser();
@@ -197,6 +235,16 @@
         },
         toOtherInfo(id) {
           location.href = "/other-info.html?id=" + id
+        },
+        toBlogDetail(b) {
+          location.href = "/blog-detail.html?id=" + b.id;
+        },
+        toChat() {
+          if (!this.loginUser || !this.loginUser.id) {
+            this.$message.error("请先登录再发起对话");
+            return;
+          }
+          location.href = `/chat.html?toId=${this.user.id}&name=${encodeURIComponent(this.user.nickName)}&icon=${this.user.icon}`;
         }
       },
 

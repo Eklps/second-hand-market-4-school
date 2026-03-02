@@ -1,21 +1,95 @@
-/*搜索框*/
-.search-bar {
-    background-color: #ff6633;
-    color: white;
+/* 顶部导航重构 - 毛玻璃药丸设计 */
+.search-bar-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     display: flex;
-    justify-content: space-around;
-    height: 7%;
     align-items: center;
-    padding: 0 8px;
+    justify-content: space-between;
+    height: 56px;
+    padding: 0 16px;
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.header-icon {
-    /*width: 2%;*/
+.header-left {
+    flex-shrink: 0;
+}
+
+.campus-selector {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    transition: all 0.3s;
+}
+
+.campus-selector:active {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.header-center {
+    flex: 1;
+    margin: 0 12px;
+}
+
+.search-input-wrapper {
+    position: relative;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 20px;
+    padding: 6px 14px;
+    display: flex;
+    align-items: center;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.search-icon {
+    color: #999;
+    font-size: 16px;
+    margin-right: 8px;
+}
+
+.custom-input {
+    border: none;
+    background: none;
+    outline: none;
+    width: 100%;
     font-size: 14px;
+    color: #333;
 }
 
-.search-input {
-    width: 70%;
+.custom-input::placeholder {
+    color: #bbb;
+}
+
+.header-right {
+    flex-shrink: 0;
+}
+
+.user-entry {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #ff8c55, #ff6633);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    box-shadow: 0 2px 8px rgba(255, 102, 51, 0.3);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.user-entry:active {
+    transform: scale(0.9);
 }
 
 .type-list {
@@ -57,7 +131,7 @@
 .blog-list {
     background-color: #f1f1f1;
     width: 100%;
-    height: calc(100% - 7% - 150px - 8%);
+    height: calc(100% - 56px - 150px - 8%);
     overflow-y: auto;
     padding: 0 8px 8px 8px;
     box-sizing: border-box;

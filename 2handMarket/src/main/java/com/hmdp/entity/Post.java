@@ -53,7 +53,7 @@ public class Post implements Serializable {
      * 用户姓名
      */
     @TableField(exist = false)
-    private String name;
+    private String nickName;
     /**
      * 是否点赞过了
      */

@@ -17,21 +17,6 @@ public class MvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-
-        registry.addInterceptor(new LoginInterceptor())
-                .excludePathPatterns(
-                        "/user/code",
-                        "/user/login",
-                        "/post/**",
-                        "/product/**",
-                        "/category/**",
-                        "/voucher/**",
-                        "/upload/**")
-                .order(1);
-
-        // 第一道拦截器，全部拦截全部放行以刷新
-        // 同时将登陆过的对象存入threadLocal,即RefreshTokenInterceptor中的UserHolder
-        registry.addInterceptor(new RefreshTokenInterceptor(stringRedisTemplate)).addPathPatterns("/**").order(0);
     }
 
 }

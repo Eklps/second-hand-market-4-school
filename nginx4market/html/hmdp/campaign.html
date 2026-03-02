@@ -10,163 +10,277 @@
     <link href="./css/shop-detail.css" rel="stylesheet">
     <link href="./css/main.css" rel="stylesheet">
     <style type="text/css">
-        .campaign-header {
-            background-image: linear-gradient(135deg, #ff6633, #ff9966);
-            padding: 30px 20px;
+        body {
+            background-color: #f7f8fa;
+            margin: 0;
+        }
+
+        .campaign-hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 45px 20px 40px;
             color: white;
             text-align: center;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
-            box-shadow: 0 4px 10px rgba(255, 102, 51, 0.3);
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
             position: relative;
+            overflow: hidden;
         }
 
-        .campaign-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .campaign-subtitle {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .back-btn {
+        .campaign-hero::after {
+            content: "";
             position: absolute;
-            top: 15px;
-            left: 15px;
-            font-size: 20px;
-            color: white;
-            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: radial-gradient(white 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.1;
         }
 
-        .voucher-list {
-            padding: 15px;
+        .campaign-title-new {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 10px rgba(255, 102, 51, 0.5);
+        }
+
+        .campaign-subtitle-new {
+            font-size: 13px;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        .back-btn-new {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 22px;
+            z-index: 10;
+        }
+
+        .voucher-list-new {
+            padding: 20px 15px;
+        }
+
+        .voucher-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+            position: relative;
+            border: 1px solid rgba(255, 102, 51, 0.05);
+        }
+
+        .card-left {
+            width: 85px;
+            height: 85px;
+            background: #fff5f2;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .card-price {
+            color: #ff6633;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .card-tag {
+            font-size: 10px;
+            color: #ff9966;
+            margin-top: 4px;
+        }
+
+        .card-mid {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .v-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .v-subtitle {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .v-stock-bar {
+            font-size: 11px;
+            color: #ff6633;
+            background: #fff0eb;
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .card-right {
+            margin-left: 10px;
+            text-align: center;
+        }
+
+        .buy-btn {
+            background: linear-gradient(90deg, #ff6633, #ff9966);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            box-shadow: 0 4px 10px rgba(255, 102, 51, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .buy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .buy-btn.disabled {
+            background: #e0e0e0;
+            box-shadow: none;
+            color: #999;
+        }
+
+        .v-time-info {
+            font-size: 10px;
+            color: #bbb;
+            margin-top: 6px;
         }
     </style>
 </head>
 
 <body>
     <div id="app">
-        <div class="campaign-header">
-            <div class="back-btn" @click="goBack"><i class="el-icon-arrow-left"></i></div>
-            <div class="campaign-title">🎁 官方直营福利抢购</div>
-            <div class="campaign-subtitle">1元秒杀盲盒 & 绝版补贴好物，手慢无！</div>
+        <div class="campaign-hero">
+            <div class="back-btn-new" @click="goBack"><i class="el-icon-arrow-left"></i></div>
+            <div class="campaign-title-new">🎁 官方直营福利抢购</div>
+            <div class="campaign-subtitle-new">1元秒杀盲盒 & 绝版补贴好物，星际配送中</div>
         </div>
 
-        <div class="voucher-list">
-            <!-- 秒杀商品/代金券列表 -->
-            <div class="voucher-box" v-for="v in vouchers" :key="v.id" v-if="!isEnd(v)">
-                <div class="voucher-circle">
-                    <div class="voucher-b">￥{{v.payValue / 100}}</div>
-                    <div class="voucher-w">秒杀价</div>
+        <div class="voucher-list-new">
+            <div class="voucher-card" v-for="v in vouchers" :key="v.id" v-if="!isEnd(v)">
+                <div class="card-left">
+                    <div class="card-price">￥{{v.payValue / 100}}</div>
+                    <div class="card-tag">秒杀专享</div>
                 </div>
-                <div class="voucher-left">
-                    <div class="voucher-title">{{v.title}}</div>
-                    <div class="voucher-subtitle">{{v.subTitle}}</div>
-                    <div class="voucher-price">原价 ￥<span>{{v.actualValue / 100}}</span></div>
+                <div class="card-mid">
+                    <div class="v-title">{{v.title}}</div>
+                    <div class="v-subtitle">{{v.subTitle}}</div>
+                    <div class="v-stock-bar">剩 {{v.stock}} 件</div>
                 </div>
-                <div class="voucher-right">
-                    <div v-if="v.type" class="seckill-box">
-                        <div class="voucher-btn" :class="{'disable-btn': isNotBegin(v) || v.stock < 1 || v.isClaimed}"
-                            @click="seckill(v)">
-                            {{isNotBegin(v) ? '尚未开始' : (v.isClaimed ? '已抢到' : (v.stock < 1 ? '已抢光' : '立即抢购' ))}} </div>
-                                <div class="seckill-stock">剩余 <span>{{v.stock}}</span> 件</div>
-                                <div class="seckill-time">{{formatTime(v)}}</div>
-                        </div>
-                        <div class="voucher-btn" v-else>立即抢购</div>
-                    </div>
-                </div>
-                <div v-if="vouchers.length === 0" style="text-align:center;color:#999;padding:40px 0;">
-                    暂无秒杀活动，敬请期待~
+                <div class="card-right">
+                    <button class="buy-btn" :class="{disabled: isNotBegin(v) || v.stock < 1 || v.isClaimed}"
+                        @click="seckill(v)">
+                        {{isNotBegin(v) ? '未开始' : (v.isClaimed ? '已抢到' : (v.stock < 1 ? '已抢光' : '立即抢购' ))}} </button>
+                            <div class="v-time-info">{{formatTime(v)}}</div>
                 </div>
             </div>
+            <div v-if="vouchers.length === 0" style="text-align:center;color:#999;padding:60px 0;">
+                <img src="/imgs/icons/empty.png" width="80" style="opacity: 0.5; margin-bottom: 15px;"><br>
+                暂无星际活动，敬请期待~
+            </div>
         </div>
-        <script src="./js/vue.js"></script>
-        <script src="./js/axios.min.js"></script>
-        <!-- 引入组件库 -->
-        <script src="./js/element.js"></script>
-        <script src="./js/common.js"></script>
-        <script>
-            const app = new Vue({
-                el: "#app",
-                data: {
+    </div>
+    <script src="./js/vue.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/element.js"></script>
+    <script src="./js/common.js"></script>
+    <script>
+        const app = new Vue({
+            el: "#app",
+            data() {
+                return {
                     util,
                     vouchers: []
-                },
-                created() {
-                    // 查询属于官方预设店铺（假设ID为1000作为官方商店，或者直接拉取特定店铺下的全平台优惠）
-                    // 您可以根据数据库里预设的关联抢购活动的productId来传值，这里默认写 1
-                    let shopId = util.getUrlParam("id") || 1;
-                    this.queryVoucher(shopId);
-                },
-                methods: {
-                    goBack() {
-                        history.back();
-                    },
-                    queryVoucher(shopId) {
-                        axios.get("/voucher/list/" + shopId)
-                            .then(({ data }) => {
-                                this.vouchers = data;
-                            })
-                            .catch(this.$message.error);
-                    },
-                    formatTime(v) {
-                        let b = new Date(v.beginTime);
-                        let e = new Date(v.endTime);
-                        return (b.getMonth() + 1) + "月" + b.getDate() + "日 "
-                            + b.getHours() + ":" + this.formatMinutes(b.getMinutes())
-                            + " ~ "
-                            + e.getHours() + ":" + this.formatMinutes(e.getMinutes());
-                    },
-                    formatMinutes(m) {
-                        if (m < 10) m = "0" + m;
-                        return m;
-                    },
-                    isNotBegin(v) {
-                        return new Date(v.beginTime).getTime() > new Date().getTime();
-                    },
-                    isEnd(v) {
-                        return new Date(v.endTime).getTime() < new Date().getTime();
-                    },
-                    seckill(v) {
-                        if (!token) {
-                            this.$message.error("请先登录");
-                            // 未登录，跳转
-                            setTimeout(() => {
-                                location.href = "/login.html"
-                            }, 200);
-                            return;
-                        }
-                        if (this.isNotBegin(v)) {
-                            this.$message.error("抢购尚未开始！");
-                            return;
-                        }
-                        if (this.isEnd(v)) {
-                            this.$message.error("抢购已经结束！");
-                            return;
-                        }
-                        if (v.stock < 1) {
-                            this.$message.error("库存不足，下次早点来哦！");
-                            return;
-                        }
-                        let id = v.id;
-                        // 秒杀抢购
-                        axios.post("/voucher-order/seckill/" + id)
-                            .then(({ data }) => {
-                                this.$message.success("抢购成功，订单号：" + data);
-                                // 本地更新库存显示和抢购状态
-                                v.stock--;
-                                v.isClaimed = true;
-                            })
-                            .catch(err => {
-                                this.$message.error(err || "抢购失败");
-                            });
-                    }
                 }
-            });
-        </script>
+            },
+            created() {
+                let shopId = util.getUrlParam("id") || 1;
+                this.queryVoucher(shopId);
+            },
+            methods: {
+                goBack() {
+                    history.back();
+                },
+                queryVoucher(shopId) {
+                    axios.get("/voucher/list/" + shopId)
+                        .then(({ data }) => {
+                            this.vouchers = data;
+                        })
+                        .catch(err => this.$message.error(err.message || '加载列表失败'));
+                },
+                formatTime(v) {
+                    let b = new Date(v.beginTime);
+                    let e = new Date(v.endTime);
+                    return (b.getMonth() + 1) + "/" + b.getDate() + " "
+                        + b.getHours() + ":" + this.formatMinutes(b.getMinutes())
+                        + "~"
+                        + e.getHours() + ":" + this.formatMinutes(e.getMinutes());
+                },
+                formatMinutes(m) {
+                    if (m < 10) m = "0" + m;
+                    return m;
+                },
+                isNotBegin(v) {
+                    return new Date(v.beginTime).getTime() > new Date().getTime();
+                },
+                isEnd(v) {
+                    return new Date(v.endTime).getTime() < new Date().getTime();
+                },
+                seckill(v) {
+                    const token = sessionStorage.getItem("token");
+                    if (!token) {
+                        this.$message.error("请先登录再参与抢购哦");
+                        setTimeout(() => {
+                            location.href = "/login.html"
+                        }, 800);
+                        return;
+                    }
+                    if (this.isNotBegin(v)) {
+                        this.$message.error("活动尚未开始，请稍候！");
+                        return;
+                    }
+                    if (v.stock < 1) {
+                        this.$message.error("库存已被抢光啦！");
+                        return;
+                    }
+                    if (v.isClaimed) {
+                        this.$message.warning("每人限购一件哦");
+                        return;
+                    }
+
+                    const loading = this.$loading({ text: '正在同步星际数据...' });
+                    axios.post("/voucher-order/seckill/" + v.id)
+                        .then(({ data }) => {
+                            this.$message.success("抢购成功！订单确认中...");
+                            v.stock--;
+                            v.isClaimed = true;
+                        })
+                        .catch(err => {
+                            this.$message.error(err.message || "抢购太火爆了，请重试");
+                        })
+                        .finally(() => loading.close());
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

@@ -36,12 +36,35 @@ import java.util.concurrent.TimeUnit;
 
 import static com.hmdp.utils.RedisConstants.*;
 
+import com.hmdp.utils.JwtUtils;
+import com.hmdp.utils.UserHolder;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.connection.BitFieldSubCommands;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static com.hmdp.utils.RedisConstants.*;
+
 @Slf4j
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    @Resource
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public Result sendCode(String phone, HttpSession session) {
@@ -65,24 +88,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (cacheCode == null || !cacheCode.equals(code)) {
             return Result.fail("验证码错误");
         }
-        User user = query().eq("phone", phone).one();
         if (user == null) {
             user = createUserWithPhone(phone);
         }
-        String token = UUID.randomUUID().toString();
+
+        // 4. 生成 JWT Token (工业级无状态认证)
         UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
         Map<String, Object> userMap = BeanUtil.beanToMap(userDTO, new HashMap<>(),
                 CopyOptions.create()
                         .setIgnoreNullValue(true)
-                        .setFieldValueEditor((fieldName, fieldValue) -> {
-                            if (fieldValue != null) {
-                                return fieldValue.toString();
-                            } else {
-                                return null;
-                            }
-                        }));
-        stringRedisTemplate.opsForHash().putAll(LOGIN_USER_KEY + token, userMap);
-        stringRedisTemplate.expire(LOGIN_USER_KEY + token, LOGIN_USER_TTL, TimeUnit.MINUTES);
+                        .setFieldValueEditor(
+                                (fieldName, fieldValue) -> fieldValue != null ? fieldValue.toString() : null));
+
+        String token = JwtUtils.createToken(userMap);
+
+        // 5. 返回结果 (前端需存入 LocalStorage)
         return Result.ok(token);
     }
 
@@ -103,24 +123,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (!isSuccess) {
             return Result.fail("更新失败");
         }
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-                .getRequest();
-        String token = request.getHeader("authorization");
-        if (StrUtil.isNotBlank(token)) {
-            String key = LOGIN_USER_KEY + token;
-            Map<String, Object> userMap = BeanUtil.beanToMap(userDTO, new HashMap<>(),
-                    CopyOptions.create()
-                            .setIgnoreNullValue(true)
-                            .setFieldValueEditor((fieldName, fieldValue) -> {
-                                if (fieldValue != null) {
-                                    return fieldValue.toString();
-                                } else {
-                                    return null;
-                                }
-                            }));
-            stringRedisTemplate.opsForHash().putAll(key, userMap);
-            stringRedisTemplate.expire(key, LOGIN_USER_TTL, TimeUnit.MINUTES);
-        }
+        // JWT 方案下，后端不再强制刷新 Redis (因为 Token 本身不可变)
+        // 建议前端在收到 OK 后，手动更新本地存储的用户信息
         return Result.ok();
     }
 

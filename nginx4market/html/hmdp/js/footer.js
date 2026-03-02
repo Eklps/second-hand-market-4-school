@@ -38,7 +38,7 @@ Vue.component("footBar", {
       } else if (i === 2) {
         location.href = "/follow-feed.html"
       } else if (i === 3) {
-        this.$message.info("消息功能正在开发中...")
+        location.href = "/chat-list.html"
       }
     }
   }

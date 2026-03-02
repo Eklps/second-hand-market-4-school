@@ -36,7 +36,7 @@ public class Voucher implements Serializable {
     /**
      * 商铺id
      */
-    @TableField("shop_id")
+    @TableField("product_id")
     private Long productId;
 
     /**

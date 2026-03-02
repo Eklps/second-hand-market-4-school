@@ -109,23 +109,30 @@
 
 <body>
   <div id="app">
-    <div class="search-bar">
-      <div class="city-btn">
+    <!-- 顶部导航栏 - 重构为毛玻璃效果 -->
+    <div class="search-bar-header">
+      <div class="header-left">
         <el-dropdown trigger="click" @command="handleCampusChange">
-          <span class="el-dropdown-link" style="color: #333; font-weight: bold;">
-            {{currentCampus}} <i class="el-icon-arrow-down el-icon--right"></i>
-          </span>
+          <div class="campus-selector">
+            <span class="campus-name">{{currentCampus}}</span>
+            <i class="el-icon-caret-bottom"></i>
+          </div>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item v-for="c in campusList" :key="c.name" :command="c.name">{{c.name}}</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
-      <div class="search-input">
-        <el-input size="mini" placeholder="搜索闲置、帖子">
-          <i slot="prefix" class="el-input__icon el-icon-search"></i>
-        </el-input>
+      <div class="header-center">
+        <div class="search-input-wrapper">
+          <i class="el-icon-search search-icon"></i>
+          <input type="text" placeholder="搜索闲置、帖子" class="custom-input">
+        </div>
       </div>
-      <div class="header-icon" @click="toPage(4)"><i class="el-icon-user"></i></div>
+      <div class="header-right">
+        <div class="user-entry" @click="toPage(4)">
+          <i class="el-icon-user"></i>
+        </div>
+      </div>
     </div>
     <div class="type-list">
       <!-- 全部按钮 -->
@@ -227,35 +234,37 @@
 
     const app = new Vue({
       el: "#app",
-      data: {
-        isReachBottom: false,
-        types: [],
-        blogs: [],
-        current: 1,
-        selectedCategoryId: null,
-        categoryMap: {
-          1: '数码产品',
-          2: '书籍杂志',
-          3: '日常用品',
-          4: '衣物服饰',
-          5: '通勤载具',
-          6: '求购'
-        },
-        currentCampus: '全部',
-        campusList: [
-          { name: '全部', x: null, y: null },
-          { name: '中大', x: 113.3934, y: 23.0617 },
-          { name: '华工', x: 113.4077, y: 23.0514 },
-          { name: '华师', x: 113.3970, y: 23.0560 },
-          { name: '广大', x: 113.3719, y: 23.0416 },
-          { name: '广工', x: 113.3912, y: 23.0401 },
-          { name: '广外', x: 113.3971, y: 23.0658 },
-          { name: '广中医', x: 113.3950, y: 23.0500 },
-          { name: '广药', x: 113.4000, y: 23.0450 },
-          { name: '广美', x: 113.3850, y: 23.0420 },
-          { name: '星海', x: 113.3900, y: 23.0550 }
-        ],
-        selectedCampusInfo: null
+      data() {
+        return {
+          isReachBottom: false,
+          types: [],
+          blogs: [],
+          current: 1,
+          selectedCategoryId: null,
+          categoryMap: {
+            1: '数码产品',
+            2: '书籍杂志',
+            3: '日常用品',
+            4: '衣物服饰',
+            5: '通勤载具',
+            6: '求购'
+          },
+          currentCampus: '全部',
+          campusList: [
+            { name: '全部', x: null, y: null },
+            { name: '中大', x: 113.3934, y: 23.0617 },
+            { name: '华工', x: 113.4077, y: 23.0514 },
+            { name: '华师', x: 113.3970, y: 23.0560 },
+            { name: '广大', x: 113.3719, y: 23.0416 },
+            { name: '广工', x: 113.3912, y: 23.0401 },
+            { name: '广外', x: 113.3971, y: 23.0658 },
+            { name: '广中医', x: 113.3950, y: 23.0500 },
+            { name: '广药', x: 113.4000, y: 23.0450 },
+            { name: '广美', x: 113.3850, y: 23.0420 },
+            { name: '星海', x: 113.3900, y: 23.0550 }
+          ],
+          selectedCampusInfo: null
+        }
       },
       created() {
         // 查询类型
@@ -275,7 +284,7 @@
               this.types = data;
             })
             .catch(err => {
-              this.$message.error(err)
+              this.$message.error(err.message || '获取分类失败')
             })
         },
         queryHotBlogsScroll() {
@@ -296,7 +305,7 @@
               this.blogs = this.blogs.concat(data);
             })
             .catch(err => {
-              this.$message.error(err)
+              this.$message.error(err.message || '获取帖子失败')
             })
         },
         addLike(b) {
@@ -305,7 +314,7 @@
               this.queryBlogById(b)
             })
             .catch(err => {
-              this.$message.error(err)
+              this.$message.error(err.message || '操作失败')
             })
         },
         queryBlogById(b) {

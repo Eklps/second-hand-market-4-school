@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>消息中心 - 大学城闲置星球</title>
+    <link rel="stylesheet" href="./css/element.css">
+    <link href="./css/main.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f7f8fa;
+            margin: 0;
+        }
+
+        #app {
+            padding-bottom: 60px;
+        }
+
+        .header-msg {
+            background: white;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: 800;
+            color: #333;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .chat-list {
+            margin-top: 10px;
+            background: white;
+        }
+
+        .chat-item {
+            display: flex;
+            padding: 15px;
+            align-items: center;
+            border-bottom: 1px solid #f5f5f5;
+            transition: background 0.2s;
+        }
+
+        .chat-item:active {
+            background: #f9f9f9;
+        }
+
+        .chat-avatar-box {
+            position: relative;
+            margin-right: 15px;
+        }
+
+        .chat-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .unread-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #ff4d4f;
+            color: white;
+            font-size: 11px;
+            padding: 0 5px;
+            height: 16px;
+            line-height: 16px;
+            border-radius: 8px;
+            min-width: 16px;
+            text-align: center;
+            border: 2px solid white;
+        }
+
+        .chat-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .chat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .chat-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .chat-time {
+            font-size: 12px;
+            color: #bbb;
+        }
+
+        .chat-last-msg {
+            font-size: 14px;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .empty-chat {
+            text-align: center;
+            padding: 100px 0;
+            color: #999;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="header-msg">消息中心</div>
+
+        <div class="chat-list" v-if="conversations.length > 0">
+            <div class="chat-item" v-for="c in conversations" :key="c.user.id" @click="toChat(c)">
+                <div class="chat-avatar-box">
+                    <img :src="c.user.icon || '/imgs/icons/default-icon.png'" class="chat-avatar">
+                    <div class="unread-badge" v-if="c.unreadCount > 0">{{c.unreadCount > 99 ? '99+' : c.unreadCount}}
+                    </div>
+                </div>
+                <div class="chat-info">
+                    <div class="chat-top">
+                        <div class="chat-name">{{c.user.nickName}}</div>
+                        <div class="chat-time">{{formatDate(c.time)}}</div>
+                    </div>
+                    <div class="chat-last-msg">{{c.lastMsg}}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="empty-chat" v-else>
+            <img src="/imgs/icons/default-icon.png" width="80"
+                style="opacity: 0.2; filter: grayscale(1); margin-bottom: 10px;"><br>
+            暂时没有新的消息哦
+        </div>
+
+        <foot-bar :active-btn="3"></foot-bar>
+    </div>
+
+    <script src="./js/vue.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/element.js"></script>
+    <script src="./js/common.js"></script>
+    <script src="./js/footer.js"></script>
+    <script>
+        const app = new Vue({
+            el: "#app",
+            data() {
+                return {
+                    conversations: []
+                }
+            },
+            created() {
+                this.loadConversations();
+            },
+            methods: {
+                loadConversations() {
+                    axios.get("/chat/list")
+                        .then(({ data }) => {
+                            this.conversations = data;
+                        })
+                        .catch(() => this.$message.error("加载消息列表失败"));
+                },
+                toChat(c) {
+                    location.href = `/chat.html?toId=${c.user.id}&name=${encodeURIComponent(c.user.nickName)}&icon=${c.user.icon}`;
+                },
+                formatDate(time) {
+                    if (!time) return '';
+                    const date = new Date(time);
+                    const now = new Date();
+                    const diff = now - date;
+
+                    if (diff < 24 * 3600 * 1000) {
+                        return date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes());
+                    } else if (diff < 48 * 3600 * 1000) {
+                        return "昨天";
+                    } else {
+                        return (date.getMonth() + 1) + "-" + date.getDate();
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

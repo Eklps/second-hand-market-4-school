@@ -99,49 +99,87 @@
 
 <body>
   <div id="app">
-    <div class="header">
-      <div class="header-back-btn" @click="goBack"><i class="el-icon-arrow-left"></i></div>
-      <div class="header-title">个人主页&nbsp;&nbsp;&nbsp;</div>
-    </div>
-    <div class="basic">
-      <div class="basic-icon">
-        <img :src="user.icon || '/imgs/icons/default-icon.png'" alt="">
+    <!-- 顶部星际背景区 -->
+    <div class="stellar-hero">
+      <div class="header-transparent">
+        <div class="back-btn" @click="goBack"><i class="el-icon-arrow-left"></i></div>
+        <div class="title-main">闲置星球 · 个人中心</div>
+        <div class="setting-btn" @click="toEdit"><i class="el-icon-setting"></i></div>
       </div>
-      <div class="basic-info">
-        <div class="name">{{user.nickName}}</div>
-        <span>{{info.city || '未知'}}</span>
-        <div class="edit-btn" @click="toEdit">
-          编辑资料
+    </div>
+
+    <!-- 悬浮个人中心卡片 -->
+    <div class="user-card-wrap">
+      <div class="user-main-card">
+        <div class="user-top">
+          <div class="avatar-box">
+            <img :src="user.icon || '/imgs/icons/default-icon.png'" alt="">
+            <div class="edit-badge" @click="toEdit"><i class="el-icon-camera"></i></div>
+          </div>
+          <div class="user-detail">
+            <div class="nick-row">
+              <span class="nick-name">{{user.nickName}}</span>
+              <span class="city-tag"><i class="el-icon-location"></i> {{info.city || '未知'}}</span>
+            </div>
+            <div class="bio-row" @click="toEdit">
+              <span v-if="info.introduce">{{info.introduce}}</span>
+              <span v-else class="bio-placeholder">添加个人简介，开启星球之旅...</span>
+            </div>
+          </div>
+          <div class="logout-minimal" @click="logout" title="退出登录">
+            <i class="el-icon-switch-button"></i>
+          </div>
+        </div>
+
+        <!-- 数字看板 -->
+        <div class="stats-board">
+          <div class="stat-item" @click="activeName='1'">
+            <div class="stat-num">{{blogs.length}}</div>
+            <div class="stat-label">笔记</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item" @click="activeName='3'">
+            <div class="stat-num">{{followersTotal}}</div>
+            <div class="stat-label">粉丝</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item" @click="activeName='4'">
+            <div class="stat-num">{{followingsTotal}}</div>
+            <div class="stat-label">关注</div>
+          </div>
         </div>
       </div>
-      <div class="logout-btn" @click="logout">
-        退出登录
+    </div>
+
+    <!-- 能量中心 (签到) -->
+    <div class="energy-wrap">
+      <div class="energy-center-card">
+        <div class="energy-left">
+          <div class="fire-icon">🔥</div>
+          <div class="energy-txt">
+            <div class="energy-title">能量签到</div>
+            <div class="energy-record">已连续签到 <span class="highlight">{{signCount}}</span> 天</div>
+          </div>
+        </div>
+        <div class="energy-right">
+          <button class="stellar-btn" :class="{signed: signed}" @click="doSign" :disabled="signed">
+            {{signed ? '已充能' : '点击充能'}}
+          </button>
+        </div>
       </div>
     </div>
-    <div class="introduce" @click="toEdit" style="cursor: pointer;">
-      <span v-if="info.introduce">{{info.introduce}}</span>
-      <span v-else>添加个人简介，让大家更好的认识你</span>
-      <i class="el-icon-edit"></i>
-    </div>
-    <!-- 签到卡片 -->
-    <div class="sign-card">
-      <div class="sign-info">
-        <span class="sign-fire">🔥</span>
-        <span>已连续签到 <span class="sign-days">{{signCount}}</span> 天</span>
-      </div>
-      <button class="sign-btn" :class="{signed: signed}" @click="doSign" :disabled="signed">
-        {{signed ? '已签到 ✓' : '签到'}}
-      </button>
-    </div>
-    <div class="content">
+
+    <div class="content-main">
       <el-tabs v-model="activeName" @tab-click="handleClick">
         <el-tab-pane label="笔记" name="1">
           <div v-for="b in blogs" :key="b.id" class="blog-item">
-            <div class="blog-img"><img :src="b.images.split(',')[0]" alt=""></div>
+            <div class="blog-img" @click="toBlogDetail(b)"><img :src="b.images.split(',')[0]" alt=""></div>
             <div class="blog-info">
-              <div class="blog-title">{{b.title}}</div>
-              <div class="blog-liked"><img src="/imgs/thumbup.png" alt=""> {{b.liked}}</div>
-              <div class="blog-comments"><i class="el-icon-chat-dot-round"></i> {{b.comments}}</div>
+              <div class="blog-title" @click="toBlogDetail(b)">{{b.title}}</div>
+              <div class="stats-row">
+                <div class="blog-liked"><img src="/imgs/thumbup.png" alt=""> {{b.liked}}</div>
+                <div class="blog-comments"><i class="el-icon-chat-dot-round"></i> {{b.comments}}</div>
+              </div>
             </div>
           </div>
         </el-tab-pane>
@@ -149,37 +187,28 @@
         <el-tab-pane label="粉丝" name="3">
           <div
             style="padding: 12px 15px; color: #666; font-size: 14px; background-color: #fcfcfc; border-bottom: 1px solid #eee;">
-            已获得 <span style="color: #ff5f3e; font-weight: bold;">{{followersTotal}}</span> 位粉丝
+            已获得 <span style="color: #ff6633; font-weight: bold;">{{followersTotal}}</span> 位粉丝
           </div>
-          <div class="follow-info" v-for="u in followers" :key="u.id">
-            <div class="follow-info-icon" @click="toOtherInfo(u.id)">
+          <div class="follow-item" v-for="u in followers" :key="u.id">
+            <div class="follow-avatar" @click="toOtherInfo(u.id)">
               <img :src="u.icon || '/imgs/icons/default-icon.png'" alt="">
             </div>
-            <div class="follow-info-name">
-              <div class="name">{{u.nickName}}</div>
-            </div>
-            <div class="follow-info-btn" @click="toOtherInfo(u.id)">
-              去主页看看
-            </div>
+            <div class="follow-nick" @click="toOtherInfo(u.id)">{{u.nickName}}</div>
+            <div class="visit-btn" @click="toOtherInfo(u.id)">去主页</div>
           </div>
         </el-tab-pane>
         <el-tab-pane label="关注" name="4">
           <div
             style="padding: 12px 15px; color: #666; font-size: 14px; background-color: #fcfcfc; border-bottom: 1px solid #eee;">
-            已关注 <span style="color: #ff5f3e; font-weight: bold;">{{followingsTotal}}</span> 人
+            已关注 <span style="color: #ff6633; font-weight: bold;">{{followingsTotal}}</span> 人
           </div>
-          <div class="follow-info" v-for="u in followings" :key="u.id">
-            <div class="follow-info-icon" @click="toOtherInfo(u.id)">
+          <div class="follow-item" v-for="u in followings" :key="u.id">
+            <div class="follow-avatar" @click="toOtherInfo(u.id)">
               <img :src="u.icon || '/imgs/icons/default-icon.png'" alt="">
             </div>
-            <div class="follow-info-name">
-              <div class="name">{{u.nickName}}</div>
-            </div>
-            <div class="follow-info-btn" @click="toOtherInfo(u.id)">
-              去主页看看
-            </div>
+            <div class="follow-nick" @click="toOtherInfo(u.id)">{{u.nickName}}</div>
+            <div class="visit-btn" @click="toOtherInfo(u.id)">去主页</div>
           </div>
-        </el-tab-pane>
       </el-tabs>
     </div>
     <foot-bar :active-btn="4"></foot-bar>
@@ -193,24 +222,26 @@
   <script>
     const app = new Vue({
       el: "#app",
-      data: {
-        user: "",
-        activeName: "1",
-        info: {},
-        signCount: 0,
-        signed: false,
-        blogs: [],
-        blogs2: [], // 关注的人的播客
-        params: {
-          minTime: 0, // 上一次拉取到的时间戳
-          offset: 0, // 偏移量
-        },
-        count: 5,
-        isReachBottom: false,
-        followers: [], // 粉丝列表
-        followersTotal: 0,
-        followings: [], // 关注列表
-        followingsTotal: 0,
+      data() {
+        return {
+          user: "",
+          activeName: "1",
+          info: {},
+          signCount: 0,
+          signed: false,
+          blogs: [],
+          blogs2: [], // 关注的人的播客
+          params: {
+            minTime: 0, // 上一次拉取到的时间戳
+            offset: 0, // 偏移量
+          },
+          count: 5,
+          isReachBottom: false,
+          followers: [], // 粉丝列表
+          followersTotal: 0,
+          followings: [], // 关注列表
+          followingsTotal: 0,
+        }
       },
       created() {
         this.queryUser();
@@ -326,6 +357,9 @@
         },
         toOtherInfo(id) {
           location.href = "other-info.html?id=" + id;
+        },
+        toBlogDetail(b) {
+          location.href = "/blog-detail.html?id=" + b.id;
         },
         addLike(b) {
           axios.put("/post/like/" + b.id)
