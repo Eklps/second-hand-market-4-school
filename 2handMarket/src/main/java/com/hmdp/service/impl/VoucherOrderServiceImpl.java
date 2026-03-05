@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -67,7 +68,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
     // 消费者名称
     private static final String CONSUMER_NAME = "c1";
     // 线程池（单线程，用于异步处理订单）
-    private static final ExecutorService SECKILL_ORDER_EXECUTOR = Executors.newSingleThreadExecutor();
+    private final ExecutorService SECKILL_ORDER_EXECUTOR = Executors.newSingleThreadExecutor();
 
     // 静态初始化lua脚本，避免每次都加载
     private static final DefaultRedisScript<Long> SEKILL_SCRIPT;
@@ -80,7 +81,7 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
     private class VoucherOrderHandler implements Runnable {
         @Override
         public void run() {
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
                     // 1.获取消息队列中的订单信息
                     // MapRecord是Spring data redis中的一个类，用于表示stream中的消息
@@ -146,11 +147,19 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
         SECKILL_ORDER_EXECUTOR.submit(new VoucherOrderHandler());
     }
 
+    @PreDestroy
+    private void destroy() {
+        // 关闭线程池
+        if (SECKILL_ORDER_EXECUTOR != null) {
+            SECKILL_ORDER_EXECUTOR.shutdown();
+        }
+    }
+
     /**
      * 处理认领了但是没ACK的消息
      */
     private void handlePendingList() {
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             try {
                 // 读取 Pending List 中的消息（用 0 而不是 >）
                 List<MapRecord<String, Object, Object>> list = stringRedisTemplate.opsForStream().read(

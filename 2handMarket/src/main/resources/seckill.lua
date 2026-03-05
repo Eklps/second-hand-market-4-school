@@ -9,9 +9,9 @@ local orderId=ARGV[3]
 --2.数据key
 -- .. 是lua的字符拼接
 --2.1库存key
-local stockKey = 'sekill:stock'.. voucherId
+local stockKey = 'seckill:stock:'.. voucherId
 --2.2订单key
-local orderKey = 'sekill:order'.. voucherId
+local orderKey = 'seckill:order:'.. voucherId
 
 --3.脚本业务
 --3.1判断库存是否充足

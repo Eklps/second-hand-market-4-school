@@ -18,7 +18,7 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(function (response) {
   // 判断执行结果
   if (!response.data.success) {
-    return Promise.reject(response.data.errorMsg)
+    return Promise.reject(response.data.errorMsg || "操作失败")
   }
   return response.data;
 }, function (error) {

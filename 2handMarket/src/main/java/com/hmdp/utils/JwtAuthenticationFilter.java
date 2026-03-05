@@ -1,8 +1,8 @@
 package com.hmdp.utils;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.jwt.JWT;
 import com.hmdp.dto.UserDTO;
-import io.jsonwebtoken.Claims;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -33,15 +33,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             // 2. 解析 Token
-            Claims claims = JwtUtils.parseToken(token);
-            if (JwtUtils.isExpired(claims)) {
+            JWT jwt = JwtUtils.parseToken(token);
+            if (!JwtUtils.verify(jwt)) {
                 filterChain.doFilter(request, response);
                 return;
             }
 
             // 3. 提取用户信息并存入 SecurityContext (工业级做法)
-            // 将 Claims 转回 UserDTO (假设我们存入时做了 Map 转换)
-            UserDTO user = BeanUtil.fillBeanWithMap(claims, new UserDTO(), false);
+            // 将 Payload 转回 UserDTO
+            UserDTO user = BeanUtil.fillBeanWithMap(jwt.getPayloads(), new UserDTO(), false);
 
             // 存入 ThreadLocal (兼容原有代码逻辑)
             UserHolder.saveUser(user);

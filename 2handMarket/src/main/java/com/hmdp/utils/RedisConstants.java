@@ -16,8 +16,6 @@ public class RedisConstants {
     public static final Long LOCK_SHOP_TTL = 10L;
 
     // 用于优化中，存储订单到redis中
-    public static final String SEKILL_STOCK_KEY = "sekill:stock";
-
     public static final String SECKILL_STOCK_KEY = "seckill:stock:";
     public static final String BLOG_LIKED_KEY = "post:liked:";
     public static final String FEED_KEY = "feed:";

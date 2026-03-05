@@ -1,43 +1,45 @@
 package com.hmdp.utils;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import java.util.Date;
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.jwt.JWT;
+import cn.hutool.jwt.JWTUtil;
+
 import java.util.Map;
 
 public class JwtUtils {
 
     // 签名密钥 (实际项目中应放入配置文件)
-    private static final String SECRET = "heima-dianping-secret-key-for-jwt-authentication-2026";
+    private static final byte[] SECRET = "heima-dianping-secret-key-for-jwt-authentication-2026".getBytes();
     // 过期时间 (默认 7 天)
-    private static final long EXPIRE = 1000 * 60 * 60 * 24 * 7;
+    private static final int EXPIRE = 1000 * 60 * 60 * 24 * 7;
 
     /**
      * 生成 Token
      */
     public static String createToken(Map<String, Object> claims) {
-        return Jwts.builder()
-                .setClaims(claims)
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRE))
-                .signWith(SignatureAlgorithm.HS256, SECRET)
-                .compact();
+        DateTime now = DateTime.now();
+        DateTime expireTime = now.offsetNew(DateField.MILLISECOND, EXPIRE);
+
+        return JWT.create()
+                .addPayloads(claims)
+                .setExpiresAt(expireTime)
+                .setKey(SECRET)
+                .sign();
     }
 
     /**
      * 解析 Token
      */
-    public static Claims parseToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET)
-                .parseClaimsJws(token)
-                .getBody();
+    public static JWT parseToken(String token) {
+        return JWTUtil.parseToken(token);
     }
 
     /**
-     * 判断是否过期
+     * 判断签名是否有效且未过期
      */
-    public static boolean isExpired(Claims claims) {
-        return claims.getExpiration().before(new Date());
+    public static boolean verify(JWT jwt) {
+        // verify 验证签名，validate 验证是否过期 (默认允许0秒误差)
+        return jwt.setKey(SECRET).verify() && jwt.validate(0);
     }
 }

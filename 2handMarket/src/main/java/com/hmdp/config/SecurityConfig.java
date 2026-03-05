@@ -14,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
@@ -39,9 +40,19 @@ public class SecurityConfig {
                 .csrf().disable() // 禁用 CSRF
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 无状态 Session
                 .and()
+                .exceptionHandling()
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json;charset=UTF-8");
+                    response.getWriter().write("{\"success\":false,\"errorMsg\":\"请先登录\"}");
+                })
+                .and()
                 .authorizeRequests()
                 // 放行静态资源和登录/验证码接口
-                .antMatchers("/user/code", "/user/login", "/blog/hot", "/post/hot", "/shop/**", "/voucher/**")
+                .antMatchers("/user/code", "/user/login",
+                        "/blog/**", "/post/**", "/post-comments/**",
+                        "/product/**", "/voucher/**",
+                        "/category/**", "/upload/**", "/ws/**")
                 .permitAll()
                 .antMatchers("/imgs/**", "/js/**", "/css/**", "/*.html").permitAll()
                 // 其余所有请求需要认证

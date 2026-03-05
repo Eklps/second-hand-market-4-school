@@ -99,7 +99,7 @@
       },
       methods: {
         queryTypes() {
-          axios.get("/shop-type/list")
+          axios.get("/category/list")
             .then(({ data }) => {
               this.types = data;
             })
@@ -156,7 +156,7 @@
           }
         },
         toShopList(id, name) {
-          location.href = "/shop-list.html?type=" + id + "&name=" + name
+          location.href = "/Product-list.html?type=" + id + "&name=" + name
         },
         toBlogDetail(b) {
           location.href = "/blog-detail.html?id=" + b.id

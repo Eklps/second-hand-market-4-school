@@ -212,7 +212,7 @@
                 }
             },
             created() {
-                let shopId = util.getUrlParam("id") || 1;
+                let shopId = util.getUrlParam("id") || 0;
                 this.queryVoucher(shopId);
             },
             methods: {
@@ -274,7 +274,7 @@
                             v.isClaimed = true;
                         })
                         .catch(err => {
-                            this.$message.error(err.message || "抢购太火爆了，请重试");
+                            this.$message.error(err || "抢购太火爆了，请重试");
                         })
                         .finally(() => loading.close());
                 }
