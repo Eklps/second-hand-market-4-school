@@ -32,7 +32,13 @@ public class ProductController {
      * @return 商铺详情数据
      */
     @GetMapping("/{id}")
+    @com.hmdp.annotation.AccessLimit(seconds = 5, maxCount = 3, needLogin = false) // 5秒内最多访问3次，无需登录也能限流
     public Result queryProductById(@PathVariable("id") Long id) {
+        // 【防穿透第一关】：基础入口防御
+        // 如果坏人故意制造诸如 -1 等无效 ID 攻击，在进入 CacheClient 之前就彻底拦截
+        if (id == null || id <= 0) {
+            return Result.fail("您请求的商铺火星去了，请重试！");
+        }
         return productService.queryById(id);
     }
 

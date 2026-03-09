@@ -16,6 +16,13 @@ axios.interceptors.request.use(
   }
 )
 axios.interceptors.response.use(function (response) {
+  // 检查后端是否下发了续签的 Token (滑动过期机制)
+  let newToken = response.headers['refresh-token'];
+  if (newToken) {
+    sessionStorage.setItem("token", newToken);
+    token = newToken; // 更新全局变量
+  }
+
   // 判断执行结果
   if (!response.data.success) {
     return Promise.reject(response.data.errorMsg)

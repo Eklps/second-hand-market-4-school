@@ -25,4 +25,5 @@ public class RedisConstants {
     public static final String LOCK_POST_KEY = "lock:post:";
     public static final String USER_SIGN_KEY = "sign:";
     public static final String POST_GEO_KEY = "post:geo:";
+    public static final String JWT_BLACKLIST_KEY = "jwt:blacklist:";
 }

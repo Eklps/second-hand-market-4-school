@@ -1,6 +1,7 @@
 package com.hmdp.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.jwt.JWT;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
@@ -15,6 +16,7 @@ import com.hmdp.utils.JwtUtils;
 import com.hmdp.utils.RegexUtils;
 import com.hmdp.utils.SystemConstants;
 import com.hmdp.utils.UserHolder;
+import org.springframework.security.core.context.SecurityContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.BitFieldSubCommands;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -180,10 +182,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (StrUtil.isBlank(token)) {
             return Result.ok();
         }
-        // 2. 删除 redis 中的 token
-        stringRedisTemplate.delete(LOGIN_USER_KEY + token);
-        // 3. 清理 UserHolder
+        // 去掉 "Bearer " 前缀
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        try {
+            // 2. 解析 Token，计算剩余有效时间
+            JWT jwt = JwtUtils.parseToken(token);
+            Object expObj = jwt.getPayload("exp");
+            if (expObj != null) {
+                // Hutool JWT 的 exp 字段存的是秒级时间戳
+                long expireMs = Long.parseLong(expObj.toString()) * 1000;
+                long remainMs = expireMs - System.currentTimeMillis();
+                if (remainMs > 0) {
+                    // 3. 将 Token 加入黑名单，TTL = 剩余有效期（到期自动清除）
+                    stringRedisTemplate.opsForValue().set(
+                            JWT_BLACKLIST_KEY + token, "1", remainMs, TimeUnit.MILLISECONDS);
+                }
+            }
+        } catch (Exception e) {
+            // Token 解析失败（可能已过期），无需处理
+        }
+        // 4. 清理线程上下文
         UserHolder.removeUser();
+        SecurityContextHolder.clearContext();
         return Result.ok();
     }
 }

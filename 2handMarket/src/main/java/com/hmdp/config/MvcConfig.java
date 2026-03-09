@@ -10,8 +10,20 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import javax.annotation.Resource;
+
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
+
+    @Resource
+    private com.hmdp.interceptor.AccessLimitInterceptor accessLimitInterceptor;
+
+    @Override
+    public void addInterceptors(org.springframework.web.servlet.config.annotation.InterceptorRegistry registry) {
+        System.out.println("【全局配置】正在加载并注册 AccessLimitInterceptor 限流拦截器");
+        // 注册限流拦截器，拦截所有路径
+        registry.addInterceptor(accessLimitInterceptor).addPathPatterns("/**");
+    }
 
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {

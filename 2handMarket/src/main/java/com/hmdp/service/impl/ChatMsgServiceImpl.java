@@ -12,9 +12,7 @@ import com.hmdp.utils.UserHolder;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -27,6 +25,9 @@ public class ChatMsgServiceImpl extends ServiceImpl<ChatMsgMapper, ChatMsg> impl
 
         @Resource
         private IUserService userService;
+
+        @Resource
+        private ChatMsgMapper chatMsgMapper;
 
         @Override
         public Result queryHistory(Long toUserId) {
@@ -43,7 +44,8 @@ public class ChatMsgServiceImpl extends ServiceImpl<ChatMsgMapper, ChatMsg> impl
         @Override
         public Result queryConversations() {
                 Long userId = UserHolder.getUser().getId();
-                // 1. 查询该用户的所有消息（作为发送者或接收者）
+
+                // ===== 第1次 SQL：查询该用户的所有消息 =====
                 List<ChatMsg> msgs = lambdaQuery()
                                 .eq(ChatMsg::getFromUserId, userId)
                                 .or()
@@ -55,33 +57,46 @@ public class ChatMsgServiceImpl extends ServiceImpl<ChatMsgMapper, ChatMsg> impl
                         return Result.ok(new ArrayList<>());
                 }
 
-                // 2. 按对方 ID 分组，取每组第一条（即最新的一条）
+                // 按对方 ID 分组，取每组第一条（即最新的一条）
                 Map<Long, ChatMsg> lastMsgMap = msgs.stream().collect(Collectors.toMap(
                                 m -> m.getFromUserId().equals(userId) ? m.getToUserId() : m.getFromUserId(),
                                 m -> m,
                                 (existing, replacement) -> existing // 保留最晚的一条
                 ));
 
-                // 3. 构建结果列表，包含对方用户信息
-                List<Map<String, Object>> result = lastMsgMap.entrySet().stream().map(entry -> {
-                        Long otherId = entry.getKey();
-                        ChatMsg lastMsg = entry.getValue();
-                        User user = userService.getById(otherId);
+                // 收集所有联系人 ID
+                Set<Long> otherUserIds = lastMsgMap.keySet();
+                //这是为了拉出聊天列表
 
-                        // 构造简单的用户信息
+                // ===== 第2次 SQL：批量查询所有联系人信息（替代 N 次 getById）=====
+                Map<Long, User> userMap = userService.listByIds(otherUserIds)
+                                .stream().collect(Collectors.toMap(User::getId, u -> u));
+
+                // ===== 第3次 SQL：聚合查询所有联系人的未读消息数（替代 N 次 count）=====
+                Map<Long, Long> unreadMap = new HashMap<>();
+                List<Map<String, Object>> unreadList = chatMsgMapper.countUnreadGroupByFromUser(userId);
+                for (Map<String, Object> row : unreadList) {
+                        Long fromUserId = ((Number) row.get("from_user_id")).longValue();
+                        Long cnt = ((Number) row.get("cnt")).longValue();
+                        unreadMap.put(fromUserId, cnt);
+                }
+
+                // 构建结果列表
+                List<Map<String, Object>> result = otherUserIds.stream().map(otherId -> {
+                        ChatMsg lastMsg = lastMsgMap.get(otherId);
+                        User user = userMap.get(otherId);
+
                         UserDTO userDTO = new UserDTO();
-                        userDTO.setId(user.getId());
-                        userDTO.setNickName(user.getNickName());
-                        userDTO.setIcon(user.getIcon());
+                        if (user != null) {
+                                userDTO.setId(user.getId());
+                                userDTO.setNickName(user.getNickName());
+                                userDTO.setIcon(user.getIcon());
+                        }
 
                         return cn.hutool.core.map.MapUtil.builder("user", (Object) userDTO)
                                         .put("lastMsg", lastMsg.getContent())
                                         .put("time", lastMsg.getCreateTime())
-                                        .put("unreadCount",
-                                                        lambdaQuery().eq(ChatMsg::getFromUserId, otherId)
-                                                                        .eq(ChatMsg::getToUserId, userId)
-                                                                        .eq(ChatMsg::getIsRead, 0)
-                                                                        .count())
+                                        .put("unreadCount", unreadMap.getOrDefault(otherId, 0L))
                                         .build();
                 }).sorted(
                                 (a, b) -> ((java.time.LocalDateTime) b.get("time"))

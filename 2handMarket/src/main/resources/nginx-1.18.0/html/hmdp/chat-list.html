@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <title>消息</title>
+    <link rel="stylesheet" href="./css/element.css">
+    <link href="./css/main.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50px;
+            z-index: 100;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #eee;
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        .header .header-back-btn {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .chat-list-container {
+            margin-top: 50px;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .chat-item:active {
+            background: #f5f5f5;
+        }
+
+        .chat-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            margin-right: 12px;
+        }
+
+        .chat-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .chat-info {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .chat-info .chat-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-info .chat-last-msg {
+            font-size: 13px;
+            color: #999;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-meta {
+            flex-shrink: 0;
+            text-align: right;
+            margin-left: 10px;
+        }
+
+        .chat-meta .chat-time {
+            font-size: 11px;
+            color: #bbb;
+            margin-bottom: 6px;
+        }
+
+        .chat-meta .chat-badge {
+            display: inline-block;
+            min-width: 18px;
+            height: 18px;
+            line-height: 18px;
+            text-align: center;
+            font-size: 11px;
+            color: #fff;
+            background: #ff4d4f;
+            border-radius: 9px;
+            padding: 0 5px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding-top: 120px;
+            color: #ccc;
+            font-size: 15px;
+        }
+
+        .empty-state i {
+            font-size: 60px;
+            display: block;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="header">
+            <div class="header-back-btn" @click="goBack"><i class="el-icon-arrow-left"></i></div>
+            <span>消息</span>
+        </div>
+
+        <div class="chat-list-container">
+            <!-- 空态 -->
+            <div class="empty-state" v-if="conversations.length === 0 && loaded">
+                <i class="el-icon-chat-dot-square"></i>
+                <div>暂无消息</div>
+            </div>
+
+            <!-- 会话列表 -->
+            <div class="chat-item" v-for="item in conversations" :key="item.user.id" @click="openChat(item.user)">
+                <div class="chat-avatar">
+                    <img :src="item.user.icon || '/imgs/icons/default-icon.png'" alt="">
+                </div>
+                <div class="chat-info">
+                    <div class="chat-name">{{ item.user.nickName || '未知用户' }}</div>
+                    <div class="chat-last-msg">{{ item.lastMsg }}</div>
+                </div>
+                <div class="chat-meta">
+                    <div class="chat-time">{{ formatTime(item.time) }}</div>
+                    <div v-if="item.unreadCount > 0">
+                        <span class="chat-badge">{{ item.unreadCount > 99 ? '99+' : item.unreadCount }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/vue.js"></script>
+    <script src="./js/axios.min.js"></script>
+    <script src="./js/element.js"></script>
+    <script src="./js/common.js"></script>
+    <script>
+        const app = new Vue({
+            el: "#app",
+            data: {
+                conversations: [],
+                loaded: false
+            },
+            created() {
+                this.loadConversations();
+            },
+            methods: {
+                goBack() {
+                    history.back();
+                },
+                loadConversations() {
+                    axios.get("/chat/list")
+                        .then(({ data }) => {
+                            this.conversations = data || [];
+                            this.loaded = true;
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            this.loaded = true;
+                        });
+                },
+                openChat(user) {
+                    location.href = "/chat-detail.html?userId=" + user.id
+                        + "&nickName=" + encodeURIComponent(user.nickName || '未知用户')
+                        + "&icon=" + encodeURIComponent(user.icon || '');
+                },
+                formatTime(timeStr) {
+                    if (!timeStr) return '';
+                    let date = new Date(timeStr);
+                    let now = new Date();
+                    // 今天的消息只显示时间
+                    if (date.toDateString() === now.toDateString()) {
+                        return date.getHours().toString().padStart(2, '0') + ':'
+                            + date.getMinutes().toString().padStart(2, '0');
+                    }
+                    // 昨天
+                    let yesterday = new Date(now);
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    if (date.toDateString() === yesterday.toDateString()) {
+                        return '昨天';
+                    }
+                    // 更早
+                    return (date.getMonth() + 1) + '/' + date.getDate();
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

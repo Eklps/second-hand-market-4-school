@@ -235,15 +235,16 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
      * @param id            商铺id，数据库根据这个查询
      * @param expireSeconds 逻辑过期时间管理人员设置的过期时间
      */
-    private void saveProduct2Redis(Long id, Long expireSeconds) {
-        // 1.查询商铺信息
-        Product product = getById(id);
+    // private void saveProduct2Redis(Long id, Long expireSeconds) {
+    // // 1.查询商铺信息
+    // Product product = getById(id);
 
-        // 2.封装RedisData，也就是包含逻辑过期时间
-        RedisData redisData = new RedisData();
-        redisData.setExpireTime(LocalDateTime.now().plusSeconds(expireSeconds));
-        redisData.setData(product);
-        // 3.写入redis
-        stringRedisTemplate.opsForValue().set(RedisConstants.CACHE_SHOP_KEY + id, JSONUtil.toJsonStr(redisData));
-    }
+    // // 2.封装RedisData，也就是包含逻辑过期时间
+    // RedisData redisData = new RedisData();
+    // redisData.setExpireTime(LocalDateTime.now().plusSeconds(expireSeconds));
+    // redisData.setData(product);
+    // // 3.写入redis
+    // stringRedisTemplate.opsForValue().set(RedisConstants.CACHE_SHOP_KEY + id,
+    // JSONUtil.toJsonStr(redisData));
+    // }
 }

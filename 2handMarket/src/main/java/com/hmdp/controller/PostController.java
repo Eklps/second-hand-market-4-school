@@ -34,10 +34,16 @@ public class PostController {
      * 根据id查询博客
      */
     @GetMapping("/{id}")
+    @com.hmdp.annotation.AccessLimit(seconds = 5, maxCount = 3, needLogin = false) // 5秒内最多访问3次，用于测试
     public Result queryPostById(
             @PathVariable("id") Long id,
             @RequestParam(value = "x", required = false) Double x,
             @RequestParam(value = "y", required = false) Double y) {
+        // 【防穿透第一关】：基础入口防御
+        // 如果坏人故意制造诸如 -1 等无效 ID 攻击，由于我们没引入布隆过滤器，在进入 CacheClient 之前就彻底拦截
+        if (id == null || id <= 0) {
+            return Result.fail("您访问的帖子被火星人劫持了！");
+        }
         return postService.queryPostById(id, x, y);
     }
 
