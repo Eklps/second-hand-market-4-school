@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import org.redisson.api.RBloomFilter;
 
 import static com.hmdp.service.impl.ProductServiceImpl.CACHE_REBUILD_EXECUTOR;
 
@@ -67,6 +68,14 @@ public class CacheClient {
      * @unit 时间的单位
      */
     public <R, ID> R queryWithPssThrough(String keyPrefix, ID id, Class<R> type, Function<ID, R> dbFallBack,
+            Long time, TimeUnit unit, RBloomFilter<ID> bloomFilter) {
+        if (bloomFilter != null && !bloomFilter.contains(id)) {
+            return null;
+        }
+        return queryWithPssThrough(keyPrefix, id, type, dbFallBack, time, unit);
+    }
+
+    public <R, ID> R queryWithPssThrough(String keyPrefix, ID id, Class<R> type, Function<ID, R> dbFallBack,
             Long time, TimeUnit unit) {
         String key = keyPrefix + id;
         // 1.从redis查询商铺缓存
@@ -100,6 +109,14 @@ public class CacheClient {
     }
 
     // 逻辑过期解决缓存击穿
+    public <R, ID> R queryWithLogicExpire(String keyPrefix, ID id, Class<R> type,
+            Function<ID, R> dbFallBack, Long time, TimeUnit unit, RBloomFilter<ID> bloomFilter) {
+        if (bloomFilter != null && !bloomFilter.contains(id)) {
+            return null;
+        }
+        return queryWithLogicExpire(keyPrefix, id, type, dbFallBack, time, unit);
+    }
+
     public <R, ID> R queryWithLogicExpire(String keyPrefix, ID id, Class<R> type,
             Function<ID, R> dbFallBack, Long time, TimeUnit unit) {
         String key = keyPrefix + id;

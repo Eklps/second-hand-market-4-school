@@ -25,10 +25,7 @@ axios.interceptors.response.use(function (response) {
   // 一般是服务端异常或者网络异常
   console.log(error)
   if (error.response.status == 401) {
-    // 未登录，跳转
-    setTimeout(() => {
-      location.href = "/login.html"
-    }, 200);
+    // 未登录，不再强制跳转，让调用页面通过 catch 自行处理（如显示遮罩）
     return Promise.reject("请先登录");
   }
   return Promise.reject("服务器异常");

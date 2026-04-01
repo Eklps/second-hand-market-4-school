@@ -232,7 +232,13 @@ public class VoucherOrderServiceImpl extends ServiceImpl<VoucherOrderMapper, Vou
             return Result.fail(res == 1 ? "库存不足,下单失败" : "一人可购一单");
         }
 
-        // TODO 加入到阻塞队列
+        // 2.2 有购买资格，把下单信息保存到消息队列
+        // 【集群支持改造】：将全局流 XADD 操作从 Lua 中解耦至 Java 层，彻底消除跨槽（CROSSSLOT）报错
+        java.util.Map<String, Object> msgMap = new java.util.HashMap<>();
+        msgMap.put("userId", userId.toString());
+        msgMap.put("voucherId", voucherId.toString());
+        msgMap.put("id", orderId.toString());
+        stringRedisTemplate.opsForStream().add(STREAM_KEY, msgMap);
 
         // 3. 返回订单id
         return Result.ok(orderId);

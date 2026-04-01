@@ -8,10 +8,10 @@ local orderId=ARGV[3]
 
 --2.数据key
 -- .. 是lua的字符拼接
---2.1库存key
-local stockKey = 'seckill:stock:'.. voucherId
---2.2订单key
-local orderKey = 'seckill:order:'.. voucherId
+--2.1库存key（引入 Hash Tag 保证路由同一节点）
+local stockKey = 'seckill:{'.. voucherId .. '}:stock'
+--2.2订单key（引入 Hash Tag 保证路由同一节点）
+local orderKey = 'seckill:{'.. voucherId .. '}:order'
 
 --3.脚本业务
 --3.1判断库存是否充足
@@ -32,6 +32,8 @@ redis.call('incrby',stockKey,-1)
 --存入用户id到当前优惠券的set集合
 redis.call('sadd',orderKey,userId)
 --3.4发送消息到队列中, XADD stream.orders * k1 v1 k2 v2
-redis.call('xadd', 'stream.orders', '*', 'userId', userId, 'voucherId', voucherId, 'id', orderId)
+-- redis.call('xadd', 'stream.orders', '*', 'userId', userId, 'voucherId', voucherId, 'id', orderId)
+-- 【高并发极限优化】为了使当前 Lua 脚本在真正的 Redis Cluster 下不报 CROSSSLOT 跨槽错误，此处移除了操作全局 stream.orders 的命令。
+-- XADD 将转移至 Java 语言层面在收到原子放行信号(0)后执行。
 --返回0
 return 0

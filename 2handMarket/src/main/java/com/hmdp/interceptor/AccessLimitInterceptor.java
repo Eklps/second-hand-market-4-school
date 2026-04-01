@@ -1,11 +1,13 @@
 package com.hmdp.interceptor;
 
-import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hmdp.annotation.AccessLimit;
 import com.hmdp.dto.Result;
 import com.hmdp.utils.UserHolder;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -14,16 +16,31 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
+import java.util.Collections;
 
 /**
- * 接口限流拦截器 (基于 Redis)
+ * 接口限流拦截器 (基于 Redis Lua 脚本，原子操作)
+ *
+ * 旧版使用 GET + SET/INCREMENT 的非原子操作，并发时存在竞态条件：
+ * 多个请求同时 GET 到 null，各自执行 SET("1")，导致计数器被重置、限流失效。
+ *
+ * 新版通过 Lua 脚本将 INCR + EXPIRE + 阈值判断合并为单次原子操作，
+ * 彻底消除并发竞态问题。
  */
+@Slf4j
 @Component
 public class AccessLimitInterceptor implements HandlerInterceptor {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+
+    // 静态初始化 Lua 脚本，避免每次请求都加载
+    private static final DefaultRedisScript<Long> ACCESS_LIMIT_SCRIPT;
+    static {
+        ACCESS_LIMIT_SCRIPT = new DefaultRedisScript<>();
+        ACCESS_LIMIT_SCRIPT.setLocation(new ClassPathResource("access_limit.lua"));
+        ACCESS_LIMIT_SCRIPT.setResultType(Long.class);
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -36,8 +53,6 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
         HandlerMethod hm = (HandlerMethod) handler;
         // 2. 尝试获取该方法上的 @AccessLimit 注解
         AccessLimit accessLimit = hm.getMethodAnnotation(AccessLimit.class);
-
-        System.out.println("【限流拦截器】URI=" + request.getRequestURI() + "，是否拦截到注解=" + (accessLimit != null));
 
         // 如果没有加上该注解，说明该接口不需要限流，直接放行
         if (accessLimit == null) {
@@ -61,26 +76,23 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
             key += ":" + UserHolder.getUser().getId();
         } else {
             // 不需要登录的公开接口，以 IP 地址为维度进行限流防刷
-            // 注意：真实生产环境中可能需要读取 X-Forwarded-For 等 Header
             String ip = request.getRemoteAddr();
             key += ":" + ip;
         }
 
-        // 5. 核心限流逻辑：Lua 脚本更好，这里用通俗的 Java 逻辑实现
-        String countStr = stringRedisTemplate.opsForValue().get(key);
-        if (StrUtil.isBlank(countStr)) {
-            // 第一次访问
-            stringRedisTemplate.opsForValue().set(key, "1", seconds, TimeUnit.SECONDS);
-        } else {
-            int count = Integer.parseInt(countStr);
-            if (count < maxCount) {
-                // 没超阈值，自增
-                stringRedisTemplate.opsForValue().increment(key);
-            } else {
-                // 超过阈值，直接拦截并返回错误信息
-                render(response, Result.fail("您的请求过于频繁，请稍后再试！"));
-                return false;
-            }
+        // 5. 核心限流逻辑：Lua 脚本原子执行 INCR + EXPIRE + 阈值判断
+        // 返回 1 表示超过阈值（拒绝），返回 0 表示未超过（放行）
+        Long result = stringRedisTemplate.execute(
+                ACCESS_LIMIT_SCRIPT,
+                Collections.singletonList(key),
+                String.valueOf(seconds),
+                String.valueOf(maxCount)
+        );
+
+        if (result != null && result == 1) {
+            log.warn("接口限流触发：URI={}, key={}", request.getRequestURI(), key);
+            render(response, Result.fail("您的请求过于频繁，请稍后再试！"));
+            return false;
         }
 
         return true;

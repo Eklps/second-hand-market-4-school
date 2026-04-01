@@ -4,11 +4,13 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-    <title>福利盲盒秒杀</title>
+    <title>福利盲盒秒杀 - 大学城闲置星球</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
     <!-- 引入样式 -->
     <link rel="stylesheet" href="./css/element.css">
     <link href="./css/shop-detail.css" rel="stylesheet">
     <link href="./css/main.css" rel="stylesheet">
+    <link href="./css/login-modal.css" rel="stylesheet">
     <style type="text/css">
         body {
             background-color: #f7f8fa;
@@ -168,6 +170,8 @@
 
 <body>
     <div id="app">
+        <!-- 全局登录弹窗 -->
+        <login-modal v-if="showLogin" @close="showLogin = false"></login-modal>
         <div class="campaign-hero">
             <div class="back-btn-new" @click="goBack"><i class="el-icon-arrow-left"></i></div>
             <div class="campaign-title-new">🎁 官方直营福利抢购</div>
@@ -202,13 +206,15 @@
     <script src="./js/axios.min.js"></script>
     <script src="./js/element.js"></script>
     <script src="./js/common.js"></script>
+    <script src="./js/login-modal.js"></script>
     <script>
         const app = new Vue({
             el: "#app",
             data() {
                 return {
                     util,
-                    vouchers: []
+                    vouchers: [],
+                    showLogin: false
                 }
             },
             created() {
@@ -247,10 +253,8 @@
                 seckill(v) {
                     const token = sessionStorage.getItem("token");
                     if (!token) {
-                        this.$message.error("请先登录再参与抢购哦");
-                        setTimeout(() => {
-                            location.href = "/login.html"
-                        }, 800);
+                        this.$message.warning("登录后即可参加盲盒活动");
+                        this.showLogin = true;
                         return;
                     }
                     if (this.isNotBegin(v)) {

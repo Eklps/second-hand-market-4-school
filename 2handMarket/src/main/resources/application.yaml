@@ -15,9 +15,12 @@ spring:
 #    password: ???
     lettuce:
       pool:
-        max-active: 10
-        max-idle: 10
-        min-idle: 1
+        # 核心改动：将最大并发连接拉满至与 Tomcat 并发处理能力匹配
+        max-active: 200
+        # 最大空闲连接也要放开，防止高并发刚结束时瞬间销毁大量连接引发抖动
+        max-idle: 200
+        # 最小保活连接，平时哪怕没流量也与 Redis 维持十个长连接保持热身
+        min-idle: 10
         time-between-eviction-runs: 10s
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段

@@ -5,10 +5,12 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
   <title>大学城闲置星球</title>
+  <link rel="icon" href="./favicon.ico" type="image/x-icon">
   <!-- 引入样式 -->
   <link rel="stylesheet" href="./css/element.css">
   <link href="./css/main.css" rel="stylesheet">
   <link href="./css/info.css" rel="stylesheet">
+  <link href="./css/login-modal.css" rel="stylesheet">
 
   <style type="text/css">
     .el-tabs--bottom .el-tabs__item.is-bottom:nth-child(2),
@@ -99,6 +101,8 @@
 
 <body>
   <div id="app">
+    <!-- 全局登录弹窗 -->
+    <login-modal v-if="showLogin" @close="closeLogin"></login-modal>
     <!-- 顶部星际背景区 -->
     <div class="stellar-hero">
       <div class="header-transparent">
@@ -219,6 +223,7 @@
   <script src="./js/element.js"></script>
   <script src="./js/common.js"></script>
   <script src="./js/footer.js"></script>
+  <script src="./js/login-modal.js"></script>
   <script>
     const app = new Vue({
       el: "#app",
@@ -241,6 +246,7 @@
           followersTotal: 0,
           followings: [], // 关注列表
           followingsTotal: 0,
+          showLogin: false,
         }
       },
       created() {
@@ -312,8 +318,14 @@
               this.queryBlogs();
             })
             .catch(err => {
-              location.href = "login.html"
+              // 未登录：显示登录弹窗
+              this.showLogin = true;
             })
+        },
+        closeLogin() {
+          this.showLogin = false;
+          // 统一返回首页
+          location.href = "/index.html";
         },
         goBack() {
           history.back();

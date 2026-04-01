@@ -50,7 +50,7 @@ public class User  implements Serializable {
     /**
      * 用户头像
      */
-    private String icon = "";
+    private String icon = "/imgs/icons/default-icon.png";
 
     /**
      * 创建时间

@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.dto.Result;
 import com.hmdp.dto.UserDTO;
 import com.hmdp.entity.Follow;
-import com.hmdp.entity.User;
 import com.hmdp.mapper.FollowMapper;
 import com.hmdp.service.IFollowService;
 import com.hmdp.service.IUserInfoService;
@@ -86,7 +85,11 @@ public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> impleme
     @Override
     public Result isFollow(Long followUserId) {
         // 1.获取登录用户
-        Long userId = UserHolder.getUser().getId();
+        UserDTO user = UserHolder.getUser();
+        if (user == null) {
+            return Result.ok(false); // 未登录默认未关注
+        }
+        Long userId = user.getId();
         // 2. 查询是否关注
         Long count = query().eq("user_id", userId)
                 .eq("follow_user_id", followUserId)
@@ -98,7 +101,11 @@ public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> impleme
     @Override
     public Result followCommons(Long id) {
         // 1.获取当前用户
-        Long userId = UserHolder.getUser().getId();
+        UserDTO currentUser = UserHolder.getUser();
+        if (currentUser == null) {
+            return Result.fail("请先登录后操作");
+        }
+        Long userId = currentUser.getId();
         String key1 = "follows:" + userId;
         // 求交集
         String key2 = "follows:" + id;
@@ -121,7 +128,11 @@ public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> impleme
 
     @Override
     public Result queryFollowers(Integer current) {
-        Long userId = UserHolder.getUser().getId();
+        UserDTO currentUser = UserHolder.getUser();
+        if (currentUser == null) {
+            return Result.fail("请先登录后查看粉丝列表");
+        }
+        Long userId = currentUser.getId();
         // 1. 查询粉丝列表（谁关注了我）
         Page<Follow> page = query().eq("follow_user_id", userId)
                 .page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));
@@ -141,7 +152,11 @@ public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> impleme
 
     @Override
     public Result queryFollowings(Integer current) {
-        Long userId = UserHolder.getUser().getId();
+        UserDTO currentUser = UserHolder.getUser();
+        if (currentUser == null) {
+            return Result.fail("请先登录后查看关注列表");
+        }
+        Long userId = currentUser.getId();
         // 1. 查询我关注的人
         Page<Follow> page = query().eq("user_id", userId)
                 .page(new Page<>(current, SystemConstants.MAX_PAGE_SIZE));

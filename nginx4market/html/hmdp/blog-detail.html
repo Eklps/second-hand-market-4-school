@@ -4,12 +4,14 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-  <title>黑马点评</title>
+  <title>大学城闲置星球</title>
+  <link rel="icon" href="./favicon.ico" type="image/x-icon">
   <!-- 引入样式 -->
   <link rel="stylesheet" href="./css/element.css">
 
   <link href="./css/blog-detail.css" rel="stylesheet">
   <link href="./css/main.css" rel="stylesheet">
+  <link href="./css/login-modal.css" rel="stylesheet">
 
   <style type="text/css">
     .header {
@@ -20,7 +22,7 @@
       font-size: 12px;
     }
 
-    .liked {}
+    .liked { color: #ff6633; }
 
     /* 详情页位置信息条 */
     .blog-location-bar {
@@ -50,6 +52,9 @@
 
 <body>
   <div id="app">
+    <!-- 全局登录弹窗 -->
+    <login-modal v-if="showLogin" @close="closeLogin"></login-modal>
+    <div class="header">
     <div class="header">
       <div class="header-back-btn" @click="goBack"><i class="el-icon-arrow-left"></i></div>
       <div class="header-title"></div>
@@ -200,6 +205,7 @@
   <!-- 引入组件库 -->
   <script src="./js/element.js"></script>
   <script src="./js/common.js"></script>
+  <script src="./js/login-modal.js"></script>
   <script>
     let each = function (ary, callback) {
       for (let i = 0, l = ary.length; i < l; i++) {
@@ -233,7 +239,8 @@
         comments: [],
         commentContent: "",
         replyTarget: null,
-        replyParent: null
+        replyParent: null,
+        showLogin: false
       },
       created() {
         let id = util.getUrlParam("id");
@@ -304,6 +311,10 @@
             .catch(this.$message.error)
         },
         addLike() {
+          if (!this.user || !this.user.id) {
+            this.$message.warning('请先登录后再点赞')
+            return;
+          }
           axios.put("/post/like/" + this.blog.id)
             .then(({ data }) => {
               axios.get("/post/" + this.blog.id)
@@ -317,7 +328,8 @@
                 .catch(this.$message.error)
             })
             .catch(err => {
-              this.$message.error(err)
+              const msg = (err.response && err.response.data && err.response.data.errorMsg) || '操作失败'
+              this.$message.error(msg)
             })
         },
         isFollowed() {
@@ -326,6 +338,10 @@
             .catch(this.$message.error)
         },
         follow() {
+          if (!this.user || !this.user.id) {
+            this.$message.warning('请先登录后再关注')
+            return;
+          }
           axios.put("/follow/" + this.blog.userId + "/" + !this.followed)
             .then(() => {
               this.$message.success(this.followed ? "已取消关注" : "已关注")
@@ -342,6 +358,10 @@
             .catch(this.$message.error)
         },
         submitComment() {
+          if (!this.user || !this.user.id) {
+            this.$message.warning('请先登录后再发表留言')
+            return;
+          }
           if (!this.commentContent) {
             this.$message.error('请输入内容')
             return;
@@ -357,7 +377,10 @@
             this.commentContent = ''
             this.cancelReply()
             this.queryComments(this.blog.id)
-          }).catch(this.$message.error)
+          }).catch(err => {
+            const msg = (err.response && err.response.data && err.response.data.errorMsg) || '留言失败，请稍后重试'
+            this.$message.error(msg)
+          })
         },
         startReply(parentComment, targetComment) {
           this.replyParent = parentComment;
@@ -377,13 +400,19 @@
             .then(({ data }) => {
               // 保存用户
               this.user = data;
-              if (this.user.id !== this.blog.userId) {
+              if (this.user && this.user.id && this.user.id !== this.blog.userId) {
                 this.isFollowed();
               }
             })
-            .catch(err => {
-              this.$message.error(err.message || '获取用户信息失败')
+            .catch(() => {
+              // 未登录：显示登录弹窗
+              this.showLogin = true;
             })
+        },
+        closeLogin() {
+          this.showLogin = false;
+          // 统一返回上一页或主页
+          history.back();
         },
         // 获取父容器宽度，并且更新所有的子节点宽度，因为我们默认所有子节点的宽高等于父节点的宽高
         updateItemWidth() {

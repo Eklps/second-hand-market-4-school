@@ -1,0 +1,210 @@
+/* 登录弹窗容器与背景遮罩 */
+.login-modal-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.login-modal-container {
+    width: 90%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px 24px;
+    position: relative;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+/* 关闭按钮 */
+.login-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 20px;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.login-modal-close:hover {
+    color: #333;
+}
+
+/* 标题 */
+.login-modal-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #161823;
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+/* Tabs 切换 */
+.login-modal-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 24px;
+    position: relative;
+}
+
+.login-tab-item {
+    font-size: 16px;
+    color: #999;
+    cursor: pointer;
+    padding-bottom: 8px;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.login-tab-item.active {
+    color: #161823;
+    font-weight: bold;
+}
+
+.login-tab-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    width: 80%;
+    height: 2px;
+    background: #161823;
+    border-radius: 2px;
+}
+
+/* 表单输入框 */
+.login-input-group {
+    margin-bottom: 16px;
+}
+
+.login-input-wrap {
+    background: #f1f1f2;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    height: 48px;
+    margin-bottom: 12px;
+    transition: background 0.2s;
+}
+
+.login-input-wrap:focus-within {
+    background: #e1e1e2;
+}
+
+.login-input-prefix {
+    font-size: 14px;
+    color: #161823;
+    padding-right: 12px;
+    border-right: 1px solid #d1d1d2;
+    margin-right: 12px;
+}
+
+.login-modal-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    color: #161823;
+}
+
+.login-modal-input::placeholder {
+    color: #bbb;
+}
+
+/* 获取验证码按钮 */
+.get-code-btn {
+    font-size: 14px;
+    color: #fe2c55;
+    font-weight: bold;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0 4px;
+}
+
+.get-code-btn:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+/* 登录按钮 - 抖音魅惑粉 */
+.login-submit-btn {
+    width: 100%;
+    height: 48px;
+    background: #fe2c55;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: opacity 0.2s;
+}
+
+.login-submit-btn:active {
+    opacity: 0.8;
+}
+
+.login-submit-btn:disabled {
+    background: #ffb1c1;
+    cursor: not-allowed;
+}
+
+/* 协议部分 */
+.login-protocol {
+    margin-top: 20px;
+    display: flex;
+    font-size: 12px;
+    color: #999;
+    line-height: 1.6;
+}
+
+.login-protocol input {
+    margin-top: 2px;
+    margin-right: 8px;
+}
+
+.login-protocol a {
+    color: #161823;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* 动画定义 */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* 模拟 Element Plus 的提示图标颜色 */
+.login-modal-input-icon {
+    font-size: 18px;
+    color: #999;
+    margin-right: 10px;
+}
+
+.footer-tip {
+    text-align: center;
+    font-size: 12px;
+    color: #bbb;
+    margin-top: 16px;
+}

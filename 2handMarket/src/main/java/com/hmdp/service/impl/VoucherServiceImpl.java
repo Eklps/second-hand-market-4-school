@@ -8,7 +8,7 @@ import com.hmdp.mapper.VoucherMapper;
 import com.hmdp.service.ISeckillVoucherService;
 import com.hmdp.service.IVoucherService;
 import com.hmdp.service.IVoucherOrderService;
-import com.hmdp.utils.RedisConstants;
+
 import com.hmdp.utils.UserHolder;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -62,7 +62,7 @@ public class VoucherServiceImpl extends ServiceImpl<VoucherMapper, Voucher> impl
                 long randomMillis = RandomUtil.randomLong(0, 1000 * 60 * 60 * 120);
                 long ttlMillis = durationMillis + randomMillis;
 
-                stringRedisTemplate.opsForValue().set(RedisConstants.SECKILL_STOCK_KEY + sv.getVoucherId(), stock,
+                stringRedisTemplate.opsForValue().set("seckill:{" + sv.getVoucherId() + "}:stock", stock,
                         ttlMillis, TimeUnit.MILLISECONDS);
             }
             System.out.println("====== 秒杀库存已全量预热至 Redis 中并附加防雪崩打散机制，预热条数: " + list.size() + " ======");
@@ -79,7 +79,7 @@ public class VoucherServiceImpl extends ServiceImpl<VoucherMapper, Voucher> impl
             for (Voucher v : vouchers) {
                 if (v.getType() == 1) { // 仅限秒杀券
                     // 高并发极致优化：不再查数据库，直接去 Redis 的 Set 集合里确认用户是否在抢购名单中
-                    String key = "seckill:order:" + v.getId(); // 注意：这里的 key 必须和 seckill.lua 中保持完全一致
+                    String key = "seckill:{" + v.getId() + "}:order"; // 注意：加入 Hash Tag 才能与 seckill.lua 对齐并支持集群
                     Boolean isMember = stringRedisTemplate.opsForSet().isMember(key, userId.toString());
                     v.setIsClaimed(Boolean.TRUE.equals(isMember));
                 }
@@ -111,7 +111,7 @@ public class VoucherServiceImpl extends ServiceImpl<VoucherMapper, Voucher> impl
         }
         long randomMillis = RandomUtil.randomLong(0, 1000 * 60 * 60 * 120);
         long ttlMillis = durationMillis + randomMillis;
-        stringRedisTemplate.opsForValue().set(RedisConstants.SECKILL_STOCK_KEY + voucher.getId(),
+        stringRedisTemplate.opsForValue().set("seckill:{" + voucher.getId() + "}:stock",
                 voucher.getStock().toString(),
                 ttlMillis, TimeUnit.MILLISECONDS);
 

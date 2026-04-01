@@ -5,8 +5,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <title>消息中心 - 大学城闲置星球</title>
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="./css/element.css">
     <link href="./css/main.css" rel="stylesheet">
+    <link href="./css/login-modal.css" rel="stylesheet">
     <style>
         body {
             background-color: #f7f8fa;
@@ -115,6 +117,8 @@
 
 <body>
     <div id="app">
+        <!-- 全局登录弹窗 -->
+        <login-modal v-if="showLogin" @close="closeLogin"></login-modal>
         <div class="header-msg">消息中心</div>
 
         <div class="chat-list" v-if="conversations.length > 0">
@@ -148,12 +152,14 @@
     <script src="./js/element.js"></script>
     <script src="./js/common.js"></script>
     <script src="./js/footer.js"></script>
+    <script src="./js/login-modal.js"></script>
     <script>
         const app = new Vue({
             el: "#app",
             data() {
                 return {
-                    conversations: []
+                    conversations: [],
+                    showLogin: false
                 }
             },
             created() {
@@ -165,7 +171,21 @@
                         .then(({ data }) => {
                             this.conversations = data;
                         })
-                        .catch(() => this.$message.error("加载消息列表失败"));
+                        .catch(err => {
+                            // 消息加载失败，如果是未登录，显示遮罩
+                            this.checkLogin();
+                            this.$message.error("加载消息列表失败");
+                        });
+                },
+                checkLogin() {
+                    axios.get("/user/me").catch(() => {
+                        this.showLogin = true;
+                    });
+                },
+                closeLogin() {
+                    this.showLogin = false;
+                    // 统一返回首页
+                    location.href = "/index.html";
                 },
                 toChat(c) {
                     location.href = `/chat.html?toId=${c.user.id}&name=${encodeURIComponent(c.user.nickName)}&icon=${c.user.icon}`;

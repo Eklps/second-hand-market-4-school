@@ -23,12 +23,15 @@ import org.springframework.data.redis.domain.geo.GeoReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import org.redisson.api.RBloomFilter;
+import org.redisson.api.RedissonClient;
 
 /**
  * <p>
@@ -48,6 +51,26 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     @Resource
     private CacheClient cacheClient;
 
+    @Resource
+    private RedissonClient redissonClient;
+
+    private RBloomFilter<Long> productBloomFilter;
+
+    @PostConstruct
+    public void initBloomFilter() {
+        productBloomFilter = redissonClient.getBloomFilter("product:bloom:filter");
+        // 初始化布隆过滤器（预计容量10000，误差率0.01）
+        productBloomFilter.tryInit(10000L, 0.01);
+
+        // 查询所有的商品id以预热布隆过滤器
+        List<Product> products = query().select("id").list();
+        if (products != null) {
+            for (Product product : products) {
+                productBloomFilter.add(product.getId());
+            }
+        }
+    }
+
     @Override
     public Result queryById(Long id) {
         // 使用缓存穿透的工具类
@@ -63,7 +86,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         // 使用缓存击穿的工具类
         Product product = cacheClient.queryWithLogicExpire(RedisConstants.CACHE_SHOP_KEY, id, Product.class,
                 this::getById,
-                RedisConstants.CACHE_SHOP_TTL, TimeUnit.MINUTES);
+                RedisConstants.CACHE_SHOP_TTL, TimeUnit.MINUTES, productBloomFilter);
 
         // 最开始的缓存穿透的调用方法
         // Product product=queryWithCacheThrough(id);
@@ -213,6 +236,15 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         // 2.删除缓存
         stringRedisTemplate.delete(RedisConstants.CACHE_SHOP_KEY + product.getId());
         return Result.ok();
+    }
+
+    @Override
+    public boolean save(Product entity) {
+        boolean saved = super.save(entity);
+        if (saved && productBloomFilter != null) {
+            productBloomFilter.add(entity.getId());
+        }
+        return saved;
     }
 
     // 建立互斥锁

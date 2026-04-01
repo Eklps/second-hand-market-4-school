@@ -5,11 +5,13 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
   <title>大学城闲置星球</title>
+  <link rel="icon" href="./favicon.ico" type="image/x-icon">
   <!-- 引入样式 -->
   <link rel="stylesheet" href="./css/element.css">
 
   <link href="./css/shop-detail.css" rel="stylesheet">
   <link href="./css/main.css" rel="stylesheet">
+  <link href="./css/login-modal.css" rel="stylesheet">
 
   <style type="text/css">
 
@@ -18,6 +20,8 @@
 
 <body>
   <div id="app">
+    <!-- 全局登录弹窗 -->
+    <login-modal v-if="showLogin" @close="showLogin = false"></login-modal>
     <div class="header">
       <div class="header-back-btn" @click="goBack"><i class="el-icon-arrow-left"></i></div>
       <div class="header-title"></div>
@@ -137,6 +141,7 @@
   <!-- 引入组件库 -->
   <script src="./js/element.js"></script>
   <script src="./js/common.js"></script>
+  <script src="./js/login-modal.js"></script>
   <script>
 
     const app = new Vue({
@@ -146,7 +151,8 @@
         shop: {},
         vouchers: [],
         comments: [],
-        distance: ''
+        distance: '',
+        showLogin: false
       },
       created() {
         // 获取参数
@@ -208,12 +214,10 @@
           return new Date(v.endTime).getTime() < new Date().getTime();
         },
         seckill(v) {
+          const token = sessionStorage.getItem("token");
           if (!token) {
-            this.$message.error("请先登录")
-            // 未登录，跳转
-            setTimeout(() => {
-              location.href = "/login.html"
-            }, 200);
+            this.$message.warning("登录后即可参加秒杀抢购");
+            this.showLogin = true;
             return;
           }
           if (this.isNotBegin(v)) {

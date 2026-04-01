@@ -1,5 +1,6 @@
 package com.hmdp.controller;
 
+import com.hmdp.annotation.AccessLimit;
 import com.hmdp.dto.Result;
 import com.hmdp.service.IVoucherOrderService;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +25,7 @@ public class VoucherOrderController {
     @Resource
     private IVoucherOrderService voucherOrderService;
 
+    @AccessLimit(seconds = 5, maxCount = 3, needLogin = true) // 每个用户 5 秒内最多 3 次
     @PostMapping("seckill/{id}")
     public Result seckillVoucher(@PathVariable("id") Long voucherId) {
         return voucherOrderService.seckillVoucher(voucherId);

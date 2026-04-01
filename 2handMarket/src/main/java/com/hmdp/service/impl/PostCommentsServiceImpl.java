@@ -81,7 +81,11 @@ public class PostCommentsServiceImpl extends ServiceImpl<PostCommentsMapper, Pos
     @Override
     public Result saveComment(PostComments comment) {
         // 1.获取当前用户（必须登录才能留言）
-        comment.setUserId(UserHolder.getUser().getId());
+        com.hmdp.dto.UserDTO currentUser = UserHolder.getUser();
+        if (currentUser == null) {
+            return Result.fail("请先登录后再发表留言");
+        }
+        comment.setUserId(currentUser.getId());
         // 2.一级留言（直接对帖子）时，parentId 和 answerId 默认为 0
         if (comment.getParentId() == null) {
             comment.setParentId(0L);
