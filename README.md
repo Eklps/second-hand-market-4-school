@@ -33,9 +33,7 @@ e:\DianPing\secondHandMarket
 │   ├── html/hmdp           # 静态 HTML/JS/CSS (Vue/Element 驱动)
 │   ├── conf/nginx.conf     # Nginx 代理配置 (8080 端口转发 8081)
 │   └── nginx.exe           # Windows Nginx 服务程序
-└── Docs                   # 技术设计文档
-    ├── [登录认证校验模块.md](file:///e:/DianPing/secondHandMarket/2handMarket/Docs/登录认证校验模块.md)
-    └── [社交功能与Redis高级数据结构模块.md](file:///e:/DianPing/secondHandMarket/2handMarket/Docs/社交功能与Redis高级数据结构模块.md)
+
 ```
 
 ---
